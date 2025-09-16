@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'home/home_screen.dart';
-import 'calculator/calculator_intro_screen.dart';
 
 void main() {
   runApp(const FiltraCheckApp());
@@ -12,20 +10,9 @@ class FiltraCheckApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final router = GoRouter(
-      initialLocation: '/home',
-      routes: [
-        GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
-        GoRoute(
-          path: '/calculator',
-          builder: (context, state) => const CalculatorIntroScreen(),
-        ),
-      ],
-    );
-
-    return MaterialApp.router(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      routerConfig: router,
+      home: const HomeScreen(),
     );
   }
 }

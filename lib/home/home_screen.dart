@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'widgets/feature_panel.dart';
 import 'widgets/about_card.dart';
 import 'widgets/news_card.dart';
@@ -19,10 +18,10 @@ class HomeScreen extends StatelessWidget {
       ),
       body: const _HomeTab(),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0, // Always Home
+        currentIndex: 0,
         onTap: (i) {
           if (i == 0) {
-            context.go('/home');
+            // Home
           }
           // i == 1 would normally be About, but disabled for now
         },
