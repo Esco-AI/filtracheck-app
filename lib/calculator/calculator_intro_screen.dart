@@ -12,16 +12,24 @@ class CalculatorIntroScreen extends StatefulWidget {
 }
 
 class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
-  // List to store the chemical selections
   final List<ChemicalSelection> _selectedChemicals = [];
+  bool _involvesHeating = false;
 
-  // Navigate to AddChemicalScreen and wait for a result
+  // State for the new checklist
+  final Map<String, bool> _checklistValues = {
+    'perchloric_acid': false,
+    'corrosive_acids': false,
+    'flammable_gases': false,
+    'acid_digestion': false,
+    'radioactive_materials': false,
+    'tall_equipment': false,
+  };
+
   Future<void> _navigateToAddChemical() async {
     final result = await Navigator.of(context).push<ChemicalSelection>(
       MaterialPageRoute(builder: (context) => const AddChemicalScreen()),
     );
 
-    // If a chemical was selected and 'Done' was pressed, add it to the list
     if (result != null) {
       setState(() {
         _selectedChemicals.add(result);
@@ -31,6 +39,8 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool hasChemicals = _selectedChemicals.isNotEmpty;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -62,14 +72,18 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
             ),
             child: Column(
               children: [
-                // Conditionally show intro or the list of chemicals
-                if (_selectedChemicals.isEmpty)
-                  _buildIntroView()
-                else
-                  _buildChemicalsList(),
+                if (!hasChemicals) _buildIntroView(),
+                if (hasChemicals) _buildChemicalsList(),
+
+                // Show the heating selector only if chemicals have been added
+                if (hasChemicals) ...[
+                  const SizedBox(height: 24),
+                  _buildHeatingSelector(),
+                  // Show checklist if heating is selected
+                  if (_involvesHeating) _buildHeatingChecklist(),
+                ],
 
                 const SizedBox(height: 24),
-
                 _CalcButton(
                   label: 'Add Chemical',
                   onPressed: _navigateToAddChemical,
@@ -78,7 +92,6 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
                 _CalcButton(
                   label: 'Evaluate',
                   onPressed: () {
-                    // TODO: navigate to Evaluate page
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Evaluate tapped')),
                     );
@@ -93,7 +106,6 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
     );
   }
 
-  // The intro view when no chemicals are added
   Widget _buildIntroView() {
     return Column(
       children: [
@@ -120,7 +132,6 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
     );
   }
 
-  // The view to display the list of added chemicals
   Widget _buildChemicalsList() {
     return ListView.separated(
       shrinkWrap: true,
@@ -133,9 +144,133 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
       separatorBuilder: (context, index) => const SizedBox(height: 12),
     );
   }
+
+  Widget _buildHeatingSelector() {
+    final options = ["Yes", "No"];
+    final selectedIndex = _involvesHeating == true ? 0 : 1;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.10),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Does it involve heating?',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Center(
+            child: ToggleButtons(
+              isSelected: List.generate(
+                options.length,
+                (i) => i == selectedIndex,
+              ),
+              onPressed: (index) {
+                setState(() {
+                  _involvesHeating = index == 0; // Yes = true, No = false
+                });
+              },
+              borderRadius: BorderRadius.circular(12),
+              borderColor: Colors.white70,
+              selectedBorderColor: Colors.white,
+              fillColor: Colors.white.withOpacity(0.2),
+              selectedColor: Colors.white,
+              color: Colors.white70,
+              textStyle: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+              constraints: const BoxConstraints(minHeight: 40, minWidth: 100),
+              children: options
+                  .map(
+                    (label) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Text(label),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeatingChecklist() {
+    return Container(
+      margin: const EdgeInsets.only(top: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Ducted: Help us narrow the model',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          _buildCheckboxTile(
+            title: 'Do you handle perchloric acid (heated)?',
+            valueKey: 'perchloric_acid',
+          ),
+          _buildCheckboxTile(
+            title: 'Do you handle highly corrosive acids (trace analysis)?',
+            valueKey: 'corrosive_acids',
+          ),
+          _buildCheckboxTile(
+            title: 'Do you handle highly flammable gases/vapors?',
+            valueKey: 'flammable_gases',
+          ),
+          _buildCheckboxTile(
+            title:
+                'Do you handle acid digestion / hot chemicals (but not perchloric)?',
+            valueKey: 'acid_digestion',
+          ),
+          _buildCheckboxTile(
+            title: 'Do you handle radioactive materials?',
+            valueKey: 'radioactive_materials',
+          ),
+          _buildCheckboxTile(
+            title: 'Do you need extra tall work space for large equipment?',
+            valueKey: 'tall_equipment',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCheckboxTile({required String title, required String valueKey}) {
+    return CheckboxListTile(
+      title: Text(title, style: const TextStyle(color: Colors.white)),
+      value: _checklistValues[valueKey],
+      onChanged: (bool? value) {
+        setState(() {
+          _checklistValues[valueKey] = value!;
+        });
+      },
+      controlAffinity: ListTileControlAffinity.leading,
+      activeColor: Colors.cyanAccent,
+      checkColor: Colors.blue,
+      contentPadding: EdgeInsets.zero,
+    );
+  }
 }
 
-// A button styled for this screen
 class _CalcButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
@@ -164,7 +299,6 @@ class _CalcButton extends StatelessWidget {
   }
 }
 
-// A card widget to display the selected chemical's info
 class _ChemicalInfoCard extends StatelessWidget {
   final ChemicalSelection selection;
 
@@ -192,7 +326,6 @@ class _ChemicalInfoCard extends StatelessWidget {
           const SizedBox(height: 8),
           _buildInfoRow('Volume:', '${selection.volume} ml'),
           _buildInfoRow('Frequency:', '${selection.frequency}/month'),
-          _buildInfoRow('Heating:', selection.involvesHeating ? 'Yes' : 'No'),
           _buildInfoRow('Density:', selection.density),
           _buildInfoRow('%Capacity:', '0.00'),
           _buildInfoRow('Mass Evaporated/month:', '0.00'),
@@ -204,12 +337,9 @@ class _ChemicalInfoCard extends StatelessWidget {
 
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 2.0,
-      ), // Added slight padding for spacing
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
       child: Row(
-        mainAxisAlignment:
-            MainAxisAlignment.spaceBetween, // Align label and value
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
