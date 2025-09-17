@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../widgets/bottom_navigation_bar.dart';
+import 'add_chemical_screen.dart';
 
 class CalculatorIntroScreen extends StatelessWidget {
   const CalculatorIntroScreen({super.key});
@@ -65,9 +66,10 @@ class CalculatorIntroScreen extends StatelessWidget {
                 _CalcButton(
                   label: 'Add Chemical',
                   onPressed: () {
-                    // TODO: navigate to Add Chemical page
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Add Chemical tapped')),
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const AddChemicalScreen(),
+                      ),
                     );
                   },
                 ),
