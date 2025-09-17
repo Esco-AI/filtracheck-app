@@ -5,7 +5,7 @@ import '../services/chemical_service.dart';
 class AddChemicalScreen extends StatefulWidget {
   const AddChemicalScreen({
     super.key,
-  }); // No initialSelection needed here anymore
+  });
 
   @override
   State<AddChemicalScreen> createState() => _AddChemicalScreenState();
@@ -47,7 +47,7 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
   void _updateDisplayedProperties(Chemical? chemical) {
     if (chemical == null) {
       setState(() {
-        _selectedChemical = null; // Clear selected chemical
+        _selectedChemical = null;
         _density = '0.00';
         _filterType = 'N/A';
       });
@@ -79,8 +79,9 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
         volume: double.parse(_volumeController.text),
         frequency: double.parse(_frequencyController.text),
         involvesHeating: _involvesHeating,
+        density: _density.isNotEmpty ? _density : 'N/A',
+        filterType: _filterType.isNotEmpty ? _filterType : 'N/A',
       );
-      // Pass the result back to the previous screen (CalculatorIntroScreen)
       Navigator.of(context).pop(selection);
     }
   }
@@ -120,7 +121,7 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
                       : null,
                   validator: (value) =>
                       value == null ? 'Please choose a chemical' : null,
-                  isExpanded: true, // <-- THE FIX IS HERE
+                  isExpanded: true,
                   items: chemicalsLoaded
                       ? _chemicalService.chemicals
                             .map<DropdownMenuItem<Chemical>>((
@@ -135,7 +136,7 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
                               );
                             })
                             .toList()
-                      : [], // Empty list if not loaded
+                      : [],
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white.withOpacity(0.1),
@@ -184,7 +185,6 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
 
                 // Heating Radio Buttons
                 _buildHeatingSelector(),
-                // Removed the Temperature field as per your request
                 const SizedBox(height: 32),
 
                 // Action Buttons
