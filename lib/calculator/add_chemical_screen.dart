@@ -1,5 +1,3 @@
-// lib/calculator/add_chemical_screen.dart
-
 import 'package:flutter/material.dart';
 import '../models/chemical.dart';
 import '../services/chemical_service.dart';
@@ -7,7 +5,7 @@ import '../services/chemical_service.dart';
 class AddChemicalScreen extends StatefulWidget {
   const AddChemicalScreen({
     super.key,
-  }); // No initialSelection needed here anymore
+  });
 
   @override
   State<AddChemicalScreen> createState() => _AddChemicalScreenState();
@@ -49,7 +47,7 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
   void _updateDisplayedProperties(Chemical? chemical) {
     if (chemical == null) {
       setState(() {
-        _selectedChemical = null; // Clear selected chemical
+        _selectedChemical = null;
         _density = '0.00';
         _filterType = 'N/A';
       });
@@ -81,8 +79,9 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
         volume: double.parse(_volumeController.text),
         frequency: double.parse(_frequencyController.text),
         involvesHeating: _involvesHeating,
+        density: _density.isNotEmpty ? _density : 'N/A',
+        filterType: _filterType.isNotEmpty ? _filterType : 'N/A',
       );
-      // Pass the result back to the previous screen (CalculatorIntroScreen)
       Navigator.of(context).pop(selection);
     }
   }
@@ -103,10 +102,12 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
           child: Container(
             padding: const EdgeInsets.all(24.0),
             decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF3AADEA), Color(0xFF0D7AC8)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               borderRadius: BorderRadius.circular(16),
-              color: const Color(
-                0xFF0D7AC8,
-              ), // A solid color from your gradient
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -120,6 +121,7 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
                       : null,
                   validator: (value) =>
                       value == null ? 'Please choose a chemical' : null,
+                  isExpanded: true,
                   items: chemicalsLoaded
                       ? _chemicalService.chemicals
                             .map<DropdownMenuItem<Chemical>>((
@@ -134,13 +136,20 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
                               );
                             })
                             .toList()
-                      : [], // Empty list if not loaded
-                  decoration: _inputDecoration('Choose Chemical'),
-                  dropdownColor: const Color(0xFF1565C0),
+                      : [],
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.1),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  dropdownColor: const Color(0xFF0D7AC8),
                   style: const TextStyle(color: Colors.white),
                   hint: chemicalsLoaded
                       ? const Text(
-                          'Select a chemical',
+                          'Choose chemical',
                           style: TextStyle(color: Colors.white70),
                         )
                       : const Text(
@@ -176,7 +185,6 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
 
                 // Heating Radio Buttons
                 _buildHeatingSelector(),
-                // Removed the Temperature field as per your request
                 const SizedBox(height: 32),
 
                 // Action Buttons
@@ -282,21 +290,19 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
   }) {
     return SizedBox(
       height: 50,
-      child: ElevatedButton(
+      child: FilledButton(
         onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isPrimary
-              ? Colors.cyan.shade300
-              : Colors.cyan.shade300.withOpacity(0.8),
+        style: FilledButton.styleFrom(
+          backgroundColor: Colors.white.withOpacity(isPrimary ? 0.28 : 0.15),
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+          shape: const StadiumBorder(),
+          textStyle: const TextStyle(
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.2,
+            fontSize: 16,
           ),
         ),
-        child: Text(
-          label,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
+        child: Text(label),
       ),
     );
   }

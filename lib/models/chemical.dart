@@ -7,8 +7,7 @@ class Chemical extends Equatable {
   final String casNo;
   final String formula;
   final Map<String, dynamic> properties;
-  final Map<String, double>
-  filterRecommendation; // Using double to match v1 logic
+  final Map<String, double> filterRecommendation;
   final List<String> specialFilters;
   final String? combinationNote;
   final String? nonDuctlessProduct;
@@ -24,8 +23,7 @@ class Chemical extends Equatable {
     this.nonDuctlessProduct,
   });
 
-  // This factory constructor is the proven method from your v1 app.
-  // It safely builds a Chemical object from a map.
+  // This factory constructor correctly handles potential null values from the CSV map.
   factory Chemical.fromMap(Map<String, dynamic> map) {
     final filterQuantities = <String, double>{};
     final specialFilters = <String>[];
@@ -34,7 +32,6 @@ class Chemical extends Equatable {
     const filterCols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
     for (var col in filterCols) {
       if (map[col] != null && map[col].toString().trim().isNotEmpty) {
-        // Use double.tryParse for safety
         final value = double.tryParse(map[col].toString().replaceAll(',', '.'));
         if (value != null && value > 0) {
           filterQuantities[col] = value;
@@ -54,10 +51,11 @@ class Chemical extends Equatable {
     }
 
     return Chemical(
+      // THE FIX: Use '??' to provide a default empty string if the value is null.
       name: map['CHEMICAL NAME']?.toString() ?? '',
       casNo: map['CAS No.']?.toString() ?? '',
       formula: map['FORMULA']?.toString() ?? '',
-      properties: map, // Store the whole map for other properties
+      properties: map,
       filterRecommendation: filterQuantities,
       specialFilters: specialFilters,
       combinationNote: map['COMBINATION']?.toString(),
@@ -74,11 +72,15 @@ class ChemicalSelection {
   final double volume;
   final double frequency;
   final bool involvesHeating;
+  final String density;
+  final String filterType;
 
   ChemicalSelection({
     required this.chemical,
     required this.volume,
     required this.frequency,
     required this.involvesHeating,
+    required this.density,
+    required this.filterType,
   });
 }
