@@ -3,9 +3,7 @@ import '../models/chemical.dart';
 import '../services/chemical_service.dart';
 
 class AddChemicalScreen extends StatefulWidget {
-  const AddChemicalScreen({
-    super.key,
-  });
+  const AddChemicalScreen({super.key});
 
   @override
   State<AddChemicalScreen> createState() => _AddChemicalScreenState();
@@ -19,7 +17,6 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
   Chemical? _selectedChemical;
   final _volumeController = TextEditingController();
   final _frequencyController = TextEditingController();
-  bool _involvesHeating = false;
 
   // Displayed properties
   String _density = '0.00';
@@ -78,7 +75,6 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
         chemical: _selectedChemical!,
         volume: double.parse(_volumeController.text),
         frequency: double.parse(_frequencyController.text),
-        involvesHeating: _involvesHeating,
         density: _density.isNotEmpty ? _density : 'N/A',
         filterType: _filterType.isNotEmpty ? _filterType : 'N/A',
       );
@@ -112,7 +108,6 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Chemical Dropdown
                 DropdownButtonFormField<Chemical>(
                   value: _selectedChemical,
                   onChanged: chemicalsLoaded
@@ -158,36 +153,18 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
                         ),
                 ),
                 const SizedBox(height: 16),
-
-                // Volume Input
                 _buildTextFormField(_volumeController, 'Volume (ml)'),
                 const SizedBox(height: 16),
-
-                // Frequency Input
                 _buildTextFormField(
                   _frequencyController,
                   'Frequency (no. of handlings in month)',
                 ),
                 const SizedBox(height: 24),
-
-                // Read-only properties
                 _buildReadOnlyField('Density', _density),
-                _buildReadOnlyField(
-                  '%Capacity',
-                  '0.00',
-                ), // Placeholder for future calculation
-                _buildReadOnlyField(
-                  'Mass Evaporated/month',
-                  '0.00',
-                ), // Placeholder for future calculation
+                _buildReadOnlyField('%Capacity', '0.00'),
+                _buildReadOnlyField('Mass Evaporated/month', '0.00'),
                 _buildReadOnlyField('Type of Filter', _filterType),
-                const SizedBox(height: 16),
-
-                // Heating Radio Buttons
-                _buildHeatingSelector(),
                 const SizedBox(height: 32),
-
-                // Action Buttons
                 _buildActionButton(
                   label: 'Done',
                   onPressed: _onDone,
@@ -244,42 +221,6 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildHeatingSelector() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const Text(
-          'Does it involve heating',
-          style: TextStyle(color: Colors.white, fontSize: 16),
-        ),
-        Row(
-          children: [
-            const Text('Yes', style: TextStyle(color: Colors.white)),
-            Radio<bool>(
-              value: true,
-              groupValue: _involvesHeating,
-              onChanged: (bool? value) {
-                setState(() => _involvesHeating = value!);
-              },
-              activeColor: Colors.white,
-              fillColor: WidgetStateProperty.all(Colors.white),
-            ),
-            const Text('No', style: TextStyle(color: Colors.white)),
-            Radio<bool>(
-              value: false,
-              groupValue: _involvesHeating,
-              onChanged: (bool? value) {
-                setState(() => _involvesHeating = value!);
-              },
-              activeColor: Colors.white,
-              fillColor: WidgetStateProperty.all(Colors.white),
-            ),
-          ],
-        ),
-      ],
     );
   }
 

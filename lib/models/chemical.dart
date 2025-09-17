@@ -1,5 +1,3 @@
-// lib/models/chemical.dart
-
 import 'package:equatable/equatable.dart';
 
 class Chemical extends Equatable {
@@ -23,12 +21,10 @@ class Chemical extends Equatable {
     this.nonDuctlessProduct,
   });
 
-  // This factory constructor correctly handles potential null values from the CSV map.
   factory Chemical.fromMap(Map<String, dynamic> map) {
     final filterQuantities = <String, double>{};
     final specialFilters = <String>[];
 
-    // Parse A-H filters
     const filterCols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
     for (var col in filterCols) {
       if (map[col] != null && map[col].toString().trim().isNotEmpty) {
@@ -39,7 +35,6 @@ class Chemical extends Equatable {
       }
     }
 
-    // Parse special filters
     const specialCols = ['HEPA', 'ESCO', '!'];
     for (var col in specialCols) {
       if (map[col] != null && map[col].toString().trim().isNotEmpty) {
@@ -51,7 +46,6 @@ class Chemical extends Equatable {
     }
 
     return Chemical(
-      // THE FIX: Use '??' to provide a default empty string if the value is null.
       name: map['CHEMICAL NAME']?.toString() ?? '',
       casNo: map['CAS No.']?.toString() ?? '',
       formula: map['FORMULA']?.toString() ?? '',
@@ -71,7 +65,6 @@ class ChemicalSelection {
   final Chemical chemical;
   final double volume;
   final double frequency;
-  final bool involvesHeating;
   final String density;
   final String filterType;
 
@@ -79,7 +72,6 @@ class ChemicalSelection {
     required this.chemical,
     required this.volume,
     required this.frequency,
-    required this.involvesHeating,
     required this.density,
     required this.filterType,
   });
