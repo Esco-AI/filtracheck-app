@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../calculator/calculator_intro_screen.dart';
+import '../../calculator/screen/calculator_intro_screen.dart';
 import 'feature_tile.dart';
 
 class FeaturePanel extends StatelessWidget {
