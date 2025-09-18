@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+enum Preference { efdA, efdB, efa, efh }
 
 class HeatingChecklist extends StatelessWidget {
   final Map<String, bool> checklistValues;
   final Function(String, bool) onChanged;
+  // Add state for preference selection
+  final Preference? selectedPreference;
+  final ValueChanged<Preference?> onPreferenceChanged;
 
   const HeatingChecklist({
     super.key,
     required this.checklistValues,
     required this.onChanged,
+    required this.selectedPreference,
+    required this.onPreferenceChanged,
   });
 
   @override
@@ -16,7 +22,7 @@ class HeatingChecklist extends StatelessWidget {
       margin: const EdgeInsets.only(top: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.1),
+        color: Colors.white.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -56,6 +62,28 @@ class HeatingChecklist extends StatelessWidget {
             title: 'Do you need extra tall work space for large equipment?',
             valueKey: 'tall_equipment',
           ),
+          // Add the preference section here
+          const SizedBox(height: 16),
+          const Divider(color: Colors.white24),
+          const SizedBox(height: 16),
+          const Text(
+            'If none apply, you can still choose a general preference:',
+            style: TextStyle(color: Colors.white, fontSize: 14),
+          ),
+          const SizedBox(height: 12),
+          _buildRadioTile(
+            title: 'EFD-A (More outlets & robust design)',
+            value: Preference.efdA,
+          ),
+          _buildRadioTile(
+            title: 'EFD-B (Digital airflow control)',
+            value: Preference.efdB,
+          ),
+          _buildRadioTile(
+            title: 'EFA (Energy-efficient high-performance)',
+            value: Preference.efa,
+          ),
+          _buildRadioTile(title: 'EFH (Low-cost)', value: Preference.efh),
         ],
       ),
     );
@@ -73,6 +101,18 @@ class HeatingChecklist extends StatelessWidget {
       controlAffinity: ListTileControlAffinity.leading,
       activeColor: Colors.cyanAccent,
       checkColor: Colors.blue,
+      contentPadding: EdgeInsets.zero,
+    );
+  }
+
+  // Helper for creating radio buttons
+  Widget _buildRadioTile({required String title, required Preference value}) {
+    return RadioListTile<Preference>(
+      title: Text(title, style: const TextStyle(color: Colors.white)),
+      value: value,
+      groupValue: selectedPreference,
+      onChanged: onPreferenceChanged,
+      activeColor: Colors.cyanAccent,
       contentPadding: EdgeInsets.zero,
     );
   }

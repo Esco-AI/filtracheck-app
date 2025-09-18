@@ -27,6 +27,8 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
     'tall_equipment': false,
   };
 
+  Preference? _selectedPreference;
+
   Future<void> _navigateToAddChemical() async {
     final result = await Navigator.of(context).push<ChemicalSelection>(
       MaterialPageRoute(builder: (context) => const AddChemicalScreen()),
@@ -78,7 +80,6 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
                 if (hasChemicals) _buildChemicalsList(),
                 if (hasChemicals) ...[
                   const SizedBox(height: 24),
-                  // Use the new HeatingSelector widget
                   HeatingSelector(
                     involvesHeating: _involvesHeating,
                     onChanged: (value) {
@@ -93,6 +94,12 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
                       onChanged: (key, value) {
                         setState(() {
                           _checklistValues[key] = value;
+                        });
+                      },
+                      selectedPreference: _selectedPreference,
+                      onPreferenceChanged: (value) {
+                        setState(() {
+                          _selectedPreference = value;
                         });
                       },
                     ),
