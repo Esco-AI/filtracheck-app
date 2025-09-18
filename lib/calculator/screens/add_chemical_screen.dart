@@ -1,3 +1,4 @@
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import '../../models/chemical.dart';
 import '../../services/chemical_service.dart';
@@ -28,11 +29,9 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
   @override
   void initState() {
     super.initState();
-    if (_chemicalService.chemicals.isEmpty) {
-      _chemicalService.initialize().then((_) {
-        if (mounted) setState(() {});
-      });
-    }
+    _chemicalService.initialize().then((_) {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
@@ -55,7 +54,6 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
     setState(() {
       _selectedChemical = chemical;
       _density = chemical.properties['SPECIFIC GRAVITY']?.toString() ?? 'N/A';
-
       final filterNames = <String>[];
       chemical.filterRecommendation.forEach((key, value) {
         if (value > 0) filterNames.add(key);
@@ -70,6 +68,7 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
 
   void _onDone() {
     if (_formKey.currentState!.validate()) {
+      if (_selectedChemical == null) return;
       final selection = ChemicalSelection(
         chemical: _selectedChemical!,
         volume: double.parse(_volumeController.text),
@@ -83,8 +82,6 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool chemicalsLoaded = _chemicalService.chemicals.isNotEmpty;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chemical Calculator'),
@@ -98,33 +95,58 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                DropdownButtonFormField<Chemical>(
-                  value: _selectedChemical,
-                  onChanged: chemicalsLoaded
-                      ? (Chemical? newValue) =>
-                            _updateDisplayedProperties(newValue)
-                      : null,
+                DropdownSearch<Chemical>(
+                  // Use 'items' for a local list
+                  items: _chemicalService.chemicals,
+                  itemAsString: (Chemical? u) => u?.name ?? '',
+                  onChanged: (Chemical? data) =>
+                      _updateDisplayedProperties(data),
+                  selectedItem: _selectedChemical,
                   validator: (value) =>
                       value == null ? 'Please choose a chemical' : null,
-                  hint: Text(
-                    chemicalsLoaded
-                        ? 'Choose chemical'
-                        : 'Loading chemicals...',
-                    style: TextStyle(color: Colors.white.withOpacity(0.7)),
-                  ),
-                  isExpanded: true,
-                  items: _chemicalService.chemicals
-                      .map<DropdownMenuItem<Chemical>>(
-                        (c) => DropdownMenuItem<Chemical>(
-                          value: c,
-                          child: Text(c.name, overflow: TextOverflow.ellipsis),
+
+                  // Props for the popup menu
+                  popupProps: PopupProps.menu(
+                    showSearchBox: true,
+                    searchFieldProps: TextFieldProps(
+                      style: const TextStyle(color: Colors.white),
+                      decoration: _inputDecoration(
+                        "Search Chemical",
+                        isHint: true,
+                      ),
+                    ),
+                    itemBuilder: (context, chemical, isSelected) {
+                      return ListTile(
+                        title: Text(
+                          chemical.name,
+                          style: TextStyle(
+                            color: isSelected
+                                ? Colors.cyanAccent
+                                : Colors.white,
+                          ),
                         ),
-                      )
-                      .toList(),
-                  decoration: _inputDecoration(""),
-                  dropdownColor: const Color(0xFF0D7AC8),
-                  iconEnabledColor: Colors.white,
-                  style: const TextStyle(color: Colors.white),
+                      );
+                    },
+
+                    // Set the background color for the popup list
+                    menuProps: MenuProps(
+                      backgroundColor: const Color(
+                        0xFF0D7AC8,
+                      ).withOpacity(0.95),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+
+                  dropdownDecoratorProps: DropDownDecoratorProps(
+                    baseStyle: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                    dropdownSearchDecoration: _inputDecoration(
+                      'Choose chemical',
+                    ),
+                  ),
+                  dropdownButtonProps: DropdownButtonProps(color: Colors.white),
                 ),
                 const SizedBox(height: 16),
                 _buildTextFormField(_volumeController, 'Volume (ml)'),
@@ -186,6 +208,14 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.white, width: 1.0),
       ),
     );
   }

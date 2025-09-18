@@ -1,5 +1,3 @@
-// lib/services/chemical_service.dart
-
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:csv/csv.dart';
 import '../models/chemical.dart';
