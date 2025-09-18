@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../models/chemical.dart';
 import '../../services/chemical_service.dart';
+import '../widgets/gradient_form_container.dart';
+import '../widgets/read_only_info_row.dart';
+import '../widgets/form_action_button.dart';
 
 class AddChemicalScreen extends StatefulWidget {
   const AddChemicalScreen({super.key});
@@ -27,9 +30,7 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
     super.initState();
     if (_chemicalService.chemicals.isEmpty) {
       _chemicalService.initialize().then((_) {
-        if (mounted) {
-          setState(() {});
-        }
+        if (mounted) setState(() {});
       });
     }
   }
@@ -63,9 +64,7 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
         if (filter.isNotEmpty) filterNames.add(filter);
       });
       _filterType = filterNames.join(', ');
-      if (_filterType.isEmpty) {
-        _filterType = 'None specified';
-      }
+      if (_filterType.isEmpty) _filterType = 'None specified';
     });
   }
 
@@ -95,16 +94,7 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
         padding: const EdgeInsets.all(24.0),
         child: Form(
           key: _formKey,
-          child: Container(
-            padding: const EdgeInsets.all(24.0),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF3AADEA), Color(0xFF0D7AC8)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16),
-            ),
+          child: GradientFormContainer(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -117,40 +107,22 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
                   validator: (value) =>
                       value == null ? 'Please choose a chemical' : null,
                   isExpanded: true,
-                  items: chemicalsLoaded
-                      ? _chemicalService.chemicals
-                            .map<DropdownMenuItem<Chemical>>((
-                              Chemical chemical,
-                            ) {
-                              return DropdownMenuItem<Chemical>(
-                                value: chemical,
-                                child: Text(
-                                  chemical.name,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              );
-                            })
-                            .toList()
-                      : [],
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white.withOpacity(0.1),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
+                  items: _chemicalService.chemicals
+                      .map<DropdownMenuItem<Chemical>>(
+                        (c) => DropdownMenuItem<Chemical>(
+                          value: c,
+                          child: Text(c.name, overflow: TextOverflow.ellipsis),
+                        ),
+                      )
+                      .toList(),
+                  decoration: _inputDecoration(
+                    chemicalsLoaded
+                        ? 'Choose chemical'
+                        : 'Loading chemicals...',
+                    isHint: true,
                   ),
                   dropdownColor: const Color(0xFF0D7AC8),
                   style: const TextStyle(color: Colors.white),
-                  hint: chemicalsLoaded
-                      ? const Text(
-                          'Choose chemical',
-                          style: TextStyle(color: Colors.white70),
-                        )
-                      : const Text(
-                          'Loading chemicals...',
-                          style: TextStyle(color: Colors.white70),
-                        ),
                 ),
                 const SizedBox(height: 16),
                 _buildTextFormField(_volumeController, 'Volume (ml)'),
@@ -160,18 +132,21 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
                   'Frequency (no. of handlings in month)',
                 ),
                 const SizedBox(height: 24),
-                _buildReadOnlyField('Density', _density),
-                _buildReadOnlyField('%Capacity', '0.00'),
-                _buildReadOnlyField('Mass Evaporated/month', '0.00'),
-                _buildReadOnlyField('Type of Filter', _filterType),
+                ReadOnlyInfoRow(label: 'Density', value: _density),
+                const ReadOnlyInfoRow(label: '%Capacity', value: '0.00'),
+                const ReadOnlyInfoRow(
+                  label: 'Mass Evaporated/month',
+                  value: '0.00',
+                ),
+                ReadOnlyInfoRow(label: 'Type of Filter', value: _filterType),
                 const SizedBox(height: 32),
-                _buildActionButton(
+                FormActionButton(
                   label: 'Done',
                   onPressed: _onDone,
                   isPrimary: true,
                 ),
                 const SizedBox(height: 12),
-                _buildActionButton(
+                FormActionButton(
                   label: 'Cancel',
                   onPressed: () => Navigator.of(context).pop(),
                 ),
@@ -190,68 +165,20 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       style: const TextStyle(color: Colors.white),
       validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter a value';
-        }
-        if (double.tryParse(value) == null) {
+        if (value == null || value.isEmpty) return 'Please enter a value';
+        if (double.tryParse(value) == null)
           return 'Please enter a valid number';
-        }
         return null;
       },
     );
   }
 
-  Widget _buildReadOnlyField(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionButton({
-    required String label,
-    required VoidCallback onPressed,
-    bool isPrimary = false,
-  }) {
-    return SizedBox(
-      height: 50,
-      child: FilledButton(
-        onPressed: onPressed,
-        style: FilledButton.styleFrom(
-          backgroundColor: Colors.white.withOpacity(isPrimary ? 0.28 : 0.15),
-          foregroundColor: Colors.white,
-          shape: const StadiumBorder(),
-          textStyle: const TextStyle(
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.2,
-            fontSize: 16,
-          ),
-        ),
-        child: Text(label),
-      ),
-    );
-  }
-
-  InputDecoration _inputDecoration(String label) {
+  InputDecoration _inputDecoration(String label, {bool isHint = false}) {
     return InputDecoration(
-      labelText: label,
+      labelText: isHint ? null : label,
+      hintText: isHint ? label : null,
       labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+      hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
       filled: true,
       fillColor: Colors.white.withOpacity(0.1),
       border: OutlineInputBorder(
