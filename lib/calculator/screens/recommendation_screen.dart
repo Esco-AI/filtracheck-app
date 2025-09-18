@@ -13,6 +13,8 @@ class RecommendationScreen extends StatelessWidget {
     final String? secondaryFilter = recommendation['secondaryFilter'];
     final List<String> unsupportedFilters =
         recommendation['unsupportedFilters'];
+    final List<String> ductedModels = recommendation['ductedModels'];
+    final bool multipleDuctedOptions = recommendation['multipleDuctedOptions'];
 
     return Scaffold(
       appBar: AppBar(
@@ -48,44 +50,90 @@ class RecommendationScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   const Divider(),
                   const SizedBox(height: 16),
-                  if (!isDucted) ...[
-                    const Text(
-                      'Proposed Cartridge Set:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+                  if (isDucted)
+                    _buildDuctedRecommendation(
+                      context,
+                      ductedModels,
+                      multipleDuctedOptions,
+                    )
+                  else
+                    _buildDuctlessRecommendation(
+                      mainFilter,
+                      secondaryFilter,
+                      unsupportedFilters,
                     ),
-                    const SizedBox(height: 8),
-                    _buildFilterRow(
-                      'Main Filter:',
-                      mainFilter ?? 'Not required',
-                    ),
-                    _buildFilterRow(
-                      'Secondary Filter:',
-                      secondaryFilter ?? 'Not required',
-                    ),
-                    if (unsupportedFilters.isNotEmpty) ...[
-                      const SizedBox(height: 12),
-                      Text(
-                        'Unsupported Filters:',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red[700],
-                        ),
-                      ),
-                      Text(
-                        'The following filters are required but cannot be accommodated in a standard two-filter ductless setup: ${unsupportedFilters.map((f) => 'CF-$f').join(', ')}',
-                        style: TextStyle(color: Colors.red[700]),
-                      ),
-                    ],
-                  ],
                 ],
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildDuctlessRecommendation(
+    String? mainFilter,
+    String? secondaryFilter,
+    List<String> unsupportedFilters,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Proposed Cartridge Set:',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        const SizedBox(height: 8),
+        _buildFilterRow('Main Filter:', mainFilter ?? 'Not required'),
+        _buildFilterRow('Secondary Filter:', secondaryFilter ?? 'Not required'),
+        if (unsupportedFilters.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Text(
+            'Unsupported Filters:',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.red[700],
+            ),
+          ),
+          Text(
+            'The following filters are required but cannot be accommodated in a standard two-filter ductless setup: ${unsupportedFilters.map((f) => 'CF-$f').join(', ')}',
+            style: TextStyle(color: Colors.red[700]),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildDuctedRecommendation(
+    BuildContext context,
+    List<String> ductedModels,
+    bool multipleDuctedOptions,
+  ) {
+    if (multipleDuctedOptions) {
+      return Text(
+        "We couldn't yet decide on a product for you. Please refine your preferences on the previous screen.",
+        style: TextStyle(color: Colors.orange[800]),
+      );
+    }
+
+    if (ductedModels.isNotEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Recommended Model(s):',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          for (final model in ductedModels)
+            Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: Text('• $model'),
+            ),
+        ],
+      );
+    }
+    return const Text(
+      'Please select your preferences on the previous screen to narrow down the ducted model recommendation.',
     );
   }
 

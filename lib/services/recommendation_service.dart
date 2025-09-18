@@ -1,3 +1,4 @@
+import 'package:filtracheck_v2/calculator/widgets/heating_selector.dart';
 import 'package:filtracheck_v2/models/chemical.dart';
 
 class RecommendationService {
@@ -5,6 +6,7 @@ class RecommendationService {
     List<ChemicalSelection> selections,
     bool involvesHeating,
     Map<String, bool> checklistValues,
+    Preference? preference,
   ) {
     // --- Step 1: Initial Analysis ---
     final Set<String> distinctFilters = {};
@@ -82,6 +84,64 @@ class RecommendationService {
       }
     }
 
+    // --- Step 4: Ducted Hood Specific Logic ---
+    List<String> ductedModels = [];
+    if (defaultIsDucted) {
+      final Map<String, bool> selections = {
+        "EFP": checklistValues['perchloric_acid'] ?? false,
+        "EFA-XP": checklistValues['flammable_gases'] ?? false,
+        "EFI": checklistValues['radioactive_materials'] ?? false,
+        "PPH": checklistValues['corrosive_acids'] ?? false,
+        "EFQ/EFA-M": checklistValues['acid_digestion'] ?? false,
+        "EFF": checklistValues['tall_equipment'] ?? false,
+      };
+
+      final picked = selections.entries
+          .where((entry) => entry.value)
+          .map((entry) => entry.key)
+          .toList();
+
+      if (picked.length == 1) {
+        ductedModels = picked;
+      } else if (picked.length > 1) {
+        // "Couldn't decide" state
+        if (preference != null) {
+          switch (preference) {
+            case Preference.efdA:
+              ductedModels = ["EFD-A"];
+              break;
+            case Preference.efdB:
+              ductedModels = ["EFD-B"];
+              break;
+            case Preference.efa:
+              ductedModels = ["EFA"];
+              break;
+            case Preference.efh:
+              ductedModels = ["EFH"];
+              break;
+          }
+        }
+      } else {
+        // Fallback to general preference
+        if (preference != null) {
+          switch (preference) {
+            case Preference.efdA:
+              ductedModels = ["EFD-A"];
+              break;
+            case Preference.efdB:
+              ductedModels = ["EFD-B"];
+              break;
+            case Preference.efa:
+              ductedModels = ["EFA"];
+              break;
+            case Preference.efh:
+              ductedModels = ["EFH"];
+              break;
+          }
+        }
+      }
+    }
+
     return {
       'isDucted': defaultIsDucted,
       'reasons': reasons,
@@ -89,6 +149,10 @@ class RecommendationService {
       'mainFilter': mainFilter,
       'secondaryFilter': secondaryFilter,
       'unsupportedFilters': unsupportedFilters,
+      'ductedModels': ductedModels,
+      'multipleDuctedOptions':
+          (ductedModels.isEmpty &&
+          (checklistValues.values.where((v) => v).length > 1)),
     };
   }
 }
