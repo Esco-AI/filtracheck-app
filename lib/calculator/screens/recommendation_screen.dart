@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../widgets/bottom_navigation_bar.dart';
+
 class RecommendationScreen extends StatelessWidget {
   final Map<String, dynamic> recommendation;
 
@@ -68,6 +70,7 @@ class RecommendationScreen extends StatelessWidget {
           ),
         ],
       ),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 0),
     );
   }
 
