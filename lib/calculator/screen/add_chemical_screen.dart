@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../models/chemical.dart';
-import '../services/chemical_service.dart';
+import '../../models/chemical.dart';
+import '../../services/chemical_service.dart';
 
 class AddChemicalScreen extends StatefulWidget {
   const AddChemicalScreen({super.key});
