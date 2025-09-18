@@ -1,19 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 import '../../models/chemical.dart';
 import '../../services/recommendation_service.dart';
 import '../../widgets/bottom_navigation_bar.dart';
 import 'add_chemical_screen.dart';
 import '../widgets/calc_button.dart';
 import '../widgets/chemical_info_card.dart';
-
-// ❌ Remove this to avoid the type conflict with Preference/HeatingChecklist:
-// import '../widgets/heating_checklist.dart';
-
-// ✅ Keep only the new file that defines Preference + HeatingChecklist:
 import '../widgets/heating_selector.dart' as ducted;
-
 import 'recommendation_screen.dart';
 
 class CalculatorIntroScreen extends StatefulWidget {
@@ -26,10 +19,8 @@ class CalculatorIntroScreen extends StatefulWidget {
 class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
   final List<ChemicalSelection> _selectedChemicals = [];
 
-  // Bring back the Yes/No switch
   bool _involvesHeating = false;
 
-  // Ducted checklist state
   final Map<String, bool> _checklistValues = {
     'perchloric_acid': false,
     'corrosive_acids': false,
@@ -39,7 +30,6 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
     'tall_equipment': false,
   };
 
-  // Preference when none of the above apply
   ducted.Preference? _selectedPreference;
 
   Future<void> _navigateToAddChemical() async {
@@ -66,7 +56,7 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
       _selectedChemicals,
       _involvesHeating,
       _checklistValues,
-      _selectedPreference, // ← If your service still expects 3 args, remove this.
+      _selectedPreference,
     );
 
     Navigator.of(context).push(
@@ -118,10 +108,8 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
                 if (hasChemicals) ...[
                   const SizedBox(height: 24),
 
-                  // 🔹 Brought back: "Does it involve heating?" Yes/No
                   _buildHeatingSelector(),
 
-                  // 🔹 Only show Ducted checklist + Preference radios if user chose "Yes"
                   if (_involvesHeating)
                     ducted.HeatingChecklist(
                       checklistValues: _checklistValues,
@@ -165,13 +153,11 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
     );
   }
 
-  // ─────────────────────────  UI PARTIALS  ─────────────────────────
-
   Widget _buildHeatingSelector() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
+        color: Colors.white.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white24),
       ),
@@ -181,50 +167,42 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
           const Expanded(
             child: Text(
               'Does it involve heating?',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-          Row(
-            children: [
-              const Text('Yes', style: TextStyle(color: Colors.white)),
-              Radio<bool>(
-                value: true,
-                groupValue: _involvesHeating,
-                onChanged: (bool? value) {
-                  setState(() {
-                    _involvesHeating = value ?? false;
-                    if (!_involvesHeating) {
-                      // Clear ducted selections when toggled to No
-                      for (final k in _checklistValues.keys) {
-                        _checklistValues[k] = false;
-                      }
-                      _selectedPreference = null;
-                    }
-                  });
-                },
-                activeColor: Colors.white,
-                // Your project uses WidgetStateProperty; keeping it consistent:
-                fillColor: WidgetStateProperty.all(Colors.white),
+          ToggleButtons(
+            isSelected: [_involvesHeating, !_involvesHeating],
+            onPressed: (index) {
+              setState(() {
+                _involvesHeating = index == 0;
+                if (!_involvesHeating) {
+                  for (final k in _checklistValues.keys) {
+                    _checklistValues[k] = false;
+                  }
+                  _selectedPreference = null;
+                }
+              });
+            },
+            borderRadius: BorderRadius.circular(8),
+            selectedColor: Colors.white,
+            color: Colors.white,
+            fillColor: Colors.white.withValues(alpha: 0.2),
+            splashColor: Colors.white.withValues(alpha: 0.4),
+            borderColor: Colors.white,
+            selectedBorderColor: Colors.white,
+            disabledBorderColor: Colors.white54,
+            children: const [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Text('Yes'),
               ),
-              const SizedBox(width: 8),
-              const Text('No', style: TextStyle(color: Colors.white)),
-              Radio<bool>(
-                value: false,
-                groupValue: _involvesHeating,
-                onChanged: (bool? value) {
-                  setState(() {
-                    _involvesHeating = value ?? false;
-                    if (!_involvesHeating) {
-                      // Clear ducted selections when toggled to No
-                      for (final k in _checklistValues.keys) {
-                        _checklistValues[k] = false;
-                      }
-                      _selectedPreference = null;
-                    }
-                  });
-                },
-                activeColor: Colors.white,
-                fillColor: WidgetStateProperty.all(Colors.white),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Text('No'),
               ),
             ],
           ),
