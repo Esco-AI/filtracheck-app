@@ -106,6 +106,12 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
                       : null,
                   validator: (value) =>
                       value == null ? 'Please choose a chemical' : null,
+                  hint: Text(
+                    chemicalsLoaded
+                        ? 'Choose chemical'
+                        : 'Loading chemicals...',
+                    style: TextStyle(color: Colors.white.withOpacity(0.7)),
+                  ),
                   isExpanded: true,
                   items: _chemicalService.chemicals
                       .map<DropdownMenuItem<Chemical>>(
@@ -115,13 +121,9 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
                         ),
                       )
                       .toList(),
-                  decoration: _inputDecoration(
-                    chemicalsLoaded
-                        ? 'Choose chemical'
-                        : 'Loading chemicals...',
-                    isHint: true,
-                  ),
+                  decoration: _inputDecoration(""),
                   dropdownColor: const Color(0xFF0D7AC8),
+                  iconEnabledColor: Colors.white,
                   style: const TextStyle(color: Colors.white),
                 ),
                 const SizedBox(height: 16),
