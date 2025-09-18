@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+
 enum Preference { efdA, efdB, efa, efh }
 
 class HeatingChecklist extends StatelessWidget {
   final Map<String, bool> checklistValues;
   final Function(String, bool) onChanged;
-  // Add state for preference selection
   final Preference? selectedPreference;
   final ValueChanged<Preference?> onPreferenceChanged;
 
@@ -22,7 +22,7 @@ class HeatingChecklist extends StatelessWidget {
       margin: const EdgeInsets.only(top: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -62,7 +62,6 @@ class HeatingChecklist extends StatelessWidget {
             title: 'Do you need extra tall work space for large equipment?',
             valueKey: 'tall_equipment',
           ),
-          // Add the preference section here
           const SizedBox(height: 16),
           const Divider(color: Colors.white24),
           const SizedBox(height: 16),
@@ -71,19 +70,35 @@ class HeatingChecklist extends StatelessWidget {
             style: TextStyle(color: Colors.white, fontSize: 14),
           ),
           const SizedBox(height: 12),
-          _buildRadioTile(
-            title: 'EFD-A (More outlets & robust design)',
-            value: Preference.efdA,
+
+          RadioGroup<Preference>(
+            groupValue: selectedPreference,
+            onChanged: onPreferenceChanged,
+            child: Column(
+              children: [
+                _buildRadioTile(
+                  context: context,
+                  title: 'EFD-A (More outlets & robust design)',
+                  value: Preference.efdA,
+                ),
+                _buildRadioTile(
+                  context: context,
+                  title: 'EFD-B (Digital airflow control)',
+                  value: Preference.efdB,
+                ),
+                _buildRadioTile(
+                  context: context,
+                  title: 'EFA (Energy-efficient high-performance)',
+                  value: Preference.efa,
+                ),
+                _buildRadioTile(
+                  context: context,
+                  title: 'EFH (Low-cost)',
+                  value: Preference.efh,
+                ),
+              ],
+            ),
           ),
-          _buildRadioTile(
-            title: 'EFD-B (Digital airflow control)',
-            value: Preference.efdB,
-          ),
-          _buildRadioTile(
-            title: 'EFA (Energy-efficient high-performance)',
-            value: Preference.efa,
-          ),
-          _buildRadioTile(title: 'EFH (Low-cost)', value: Preference.efh),
         ],
       ),
     );
@@ -91,29 +106,45 @@ class HeatingChecklist extends StatelessWidget {
 
   Widget _buildCheckboxTile({required String title, required String valueKey}) {
     return CheckboxListTile(
-      title: Text(title, style: const TextStyle(color: Colors.white)),
+      title: Text(
+        title,
+        style: const TextStyle(color: Colors.white, fontSize: 14),
+      ),
       value: checklistValues[valueKey],
       onChanged: (bool? value) {
-        if (value != null) {
-          onChanged(valueKey, value);
-        }
+        if (value != null) onChanged(valueKey, value);
       },
       controlAffinity: ListTileControlAffinity.leading,
       activeColor: Colors.cyanAccent,
-      checkColor: Colors.blue,
+      checkColor: Colors.black,
+      side: const BorderSide(color: Colors.white),
       contentPadding: EdgeInsets.zero,
     );
   }
 
-  // Helper for creating radio buttons
-  Widget _buildRadioTile({required String title, required Preference value}) {
-    return RadioListTile<Preference>(
-      title: Text(title, style: const TextStyle(color: Colors.white)),
-      value: value,
-      groupValue: selectedPreference,
-      onChanged: onPreferenceChanged,
-      activeColor: Colors.cyanAccent,
+  Widget _buildRadioTile({
+    required BuildContext context,
+    required String title,
+    required Preference value,
+  }) {
+    return ListTile(
       contentPadding: EdgeInsets.zero,
+      leading: Radio<Preference>(
+        value: value,
+        activeColor: Colors.cyanAccent,
+        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return Colors.cyanAccent;
+          }
+          return Colors.white;
+        }),
+        toggleable: true,
+      ),
+      title: Text(
+        title,
+        style: const TextStyle(color: Colors.white, fontSize: 14),
+      ),
+      onTap: () => onPreferenceChanged(value),
     );
   }
 }

@@ -99,7 +99,11 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
                       selectedPreference: _selectedPreference,
                       onPreferenceChanged: (value) {
                         setState(() {
-                          _selectedPreference = value;
+                          if (_selectedPreference == value) {
+                            _selectedPreference = null;
+                          } else {
+                            _selectedPreference = value;
+                          }
                         });
                       },
                     ),
