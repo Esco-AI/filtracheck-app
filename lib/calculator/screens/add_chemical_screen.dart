@@ -5,6 +5,7 @@ import '../../services/chemical_service.dart';
 import '../widgets/gradient_form_container.dart';
 import '../widgets/read_only_info_row.dart';
 import '../widgets/form_action_button.dart';
+import '../../widgets/bottom_navigation_bar.dart';
 
 class AddChemicalScreen extends StatefulWidget {
   const AddChemicalScreen({super.key});
@@ -58,9 +59,9 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
       chemical.filterRecommendation.forEach((key, value) {
         if (value > 0) filterNames.add(key);
       });
-      chemical.specialFilters.forEach((filter) {
+      for (var filter in chemical.specialFilters) {
         if (filter.isNotEmpty) filterNames.add(filter);
-      });
+      }
       _filterType = filterNames.join(', ');
       if (_filterType.isEmpty) _filterType = 'None specified';
     });
@@ -132,7 +133,7 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
                     menuProps: MenuProps(
                       backgroundColor: const Color(
                         0xFF0D7AC8,
-                      ).withOpacity(0.95),
+                      ).withValues(alpha: 0.95),
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
@@ -179,6 +180,7 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 0),
     );
   }
 
@@ -190,8 +192,9 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
       style: const TextStyle(color: Colors.white),
       validator: (value) {
         if (value == null || value.isEmpty) return 'Please enter a value';
-        if (double.tryParse(value) == null)
+        if (double.tryParse(value) == null) {
           return 'Please enter a valid number';
+        }
         return null;
       },
     );
@@ -201,10 +204,10 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
     return InputDecoration(
       labelText: isHint ? null : label,
       hintText: isHint ? label : null,
-      labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-      hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+      labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+      hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
       filled: true,
-      fillColor: Colors.white.withOpacity(0.1),
+      fillColor: Colors.white.withValues(alpha: 0.1),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
