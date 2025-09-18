@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../models/chemical.dart';
+import '../../services/recommendation_service.dart';
 import '../../widgets/bottom_navigation_bar.dart';
 import 'add_chemical_screen.dart';
 import '../widgets/calc_button.dart';
 import '../widgets/chemical_info_card.dart';
 import '../widgets/heating_checklist.dart';
 import '../widgets/heating_selector.dart';
+import 'recommendation_screen.dart';
 
 class CalculatorIntroScreen extends StatefulWidget {
   const CalculatorIntroScreen({super.key});
@@ -39,6 +41,28 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
         _selectedChemicals.add(result);
       });
     }
+  }
+
+  void _evaluateChemicals() {
+    if (_selectedChemicals.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please add at least one chemical.')),
+      );
+      return;
+    }
+
+    final recommendation = RecommendationService.evaluate(
+      _selectedChemicals,
+      _involvesHeating,
+      _checklistValues,
+    );
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) =>
+            RecommendationScreen(recommendation: recommendation),
+      ),
+    );
   }
 
   @override
@@ -114,14 +138,7 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
                   onPressed: _navigateToAddChemical,
                 ),
                 const SizedBox(height: 12),
-                CalcButton(
-                  label: 'Evaluate',
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Evaluate tapped')),
-                    );
-                  },
-                ),
+                CalcButton(label: 'Evaluate', onPressed: _evaluateChemicals),
               ],
             ),
           ),
