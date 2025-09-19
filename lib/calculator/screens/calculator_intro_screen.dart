@@ -32,14 +32,26 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
 
   ducted.Preference? _selectedPreference;
 
-  Future<void> _navigateToAddChemical() async {
+  Future<void> _navigateToAddChemical({
+    ChemicalSelection? chemicalToEdit,
+  }) async {
     final result = await Navigator.of(context).push<ChemicalSelection>(
-      MaterialPageRoute(builder: (context) => const AddChemicalScreen()),
+      MaterialPageRoute(
+        builder: (context) =>
+            AddChemicalScreen(chemicalSelection: chemicalToEdit),
+      ),
     );
 
     if (result != null) {
       setState(() {
-        _selectedChemicals.add(result);
+        if (chemicalToEdit != null) {
+          final index = _selectedChemicals.indexOf(chemicalToEdit);
+          if (index != -1) {
+            _selectedChemicals[index] = result;
+          }
+        } else {
+          _selectedChemicals.add(result);
+        }
       });
     }
   }
@@ -65,6 +77,12 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
             RecommendationScreen(recommendation: recommendation),
       ),
     );
+  }
+
+  void _deleteChemical(int index) {
+    setState(() {
+      _selectedChemicals.removeAt(index);
+    });
   }
 
   @override
@@ -104,20 +122,15 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
               children: [
                 if (!hasChemicals) _buildIntroView(),
                 if (hasChemicals) _buildChemicalsList(),
-
                 if (hasChemicals) ...[
                   const SizedBox(height: 24),
-
                   _buildHeatingSelector(),
-
                   if (_involvesHeating)
                     ducted.HeatingChecklist(
                       checklistValues: _checklistValues,
                       onChanged: (key, value) {
                         setState(() {
                           _checklistValues[key] = value;
-
-                          // Auto-clear Preference if ANY checkbox turns ON
                           if (_checklistValues.values.any((v) => v)) {
                             _selectedPreference = null;
                           }
@@ -126,7 +139,6 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
                       selectedPreference: _selectedPreference,
                       onPreferenceChanged: (val) {
                         setState(() {
-                          // Toggle behavior for radios
                           if (_selectedPreference == val) {
                             _selectedPreference = null;
                           } else {
@@ -136,11 +148,10 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
                       },
                     ),
                 ],
-
                 const SizedBox(height: 24),
                 CalcButton(
                   label: 'Add Chemical',
-                  onPressed: _navigateToAddChemical,
+                  onPressed: () => _navigateToAddChemical(),
                 ),
                 const SizedBox(height: 12),
                 CalcButton(label: 'Evaluate', onPressed: _evaluateChemicals),
@@ -244,7 +255,11 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
       itemCount: _selectedChemicals.length,
       itemBuilder: (context, index) {
         final selection = _selectedChemicals[index];
-        return ChemicalInfoCard(selection: selection);
+        return ChemicalInfoCard(
+          selection: selection,
+          onEdit: () => _navigateToAddChemical(chemicalToEdit: selection),
+          onDelete: () => _deleteChemical(index),
+        );
       },
       separatorBuilder: (context, index) => const SizedBox(height: 12),
     );

@@ -19,7 +19,9 @@ class FormActionButton extends StatelessWidget {
       child: FilledButton(
         onPressed: onPressed,
         style: FilledButton.styleFrom(
-          backgroundColor: Colors.white.withOpacity(isPrimary ? 0.28 : 0.15),
+          backgroundColor: Colors.white.withValues(
+            alpha: isPrimary ? 0.28 : 0.15,
+          ),
           foregroundColor: Colors.white,
           shape: const StadiumBorder(),
           textStyle: const TextStyle(

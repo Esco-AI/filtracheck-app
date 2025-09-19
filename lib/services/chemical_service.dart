@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:csv/csv.dart';
 import '../models/chemical.dart';
@@ -55,7 +56,9 @@ class ChemicalService {
         }
       } catch (e) {
         // This will help debug any single bad row in the CSV without crashing
-        print('Error parsing row $i: $e');
+        if (kDebugMode) {
+          print('Error parsing row $i: $e');
+        }
       }
     }
 

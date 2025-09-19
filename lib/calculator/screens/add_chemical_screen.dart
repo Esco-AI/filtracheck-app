@@ -8,7 +8,8 @@ import '../widgets/form_action_button.dart';
 import '../../widgets/bottom_navigation_bar.dart';
 
 class AddChemicalScreen extends StatefulWidget {
-  const AddChemicalScreen({super.key});
+  final ChemicalSelection? chemicalSelection;
+  const AddChemicalScreen({super.key, this.chemicalSelection});
 
   @override
   State<AddChemicalScreen> createState() => _AddChemicalScreenState();
@@ -18,20 +19,30 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
   final _formKey = GlobalKey<FormState>();
   final ChemicalService _chemicalService = ChemicalService();
 
-  // Form state
   Chemical? _selectedChemical;
   final _volumeController = TextEditingController();
   final _frequencyController = TextEditingController();
 
-  // Displayed properties
   String _density = '0.00';
   String _filterType = 'N/A';
+  bool get _isEditing => widget.chemicalSelection != null;
 
   @override
   void initState() {
     super.initState();
     _chemicalService.initialize().then((_) {
-      if (mounted) setState(() {});
+      if (mounted) {
+        setState(() {
+          if (_isEditing) {
+            _selectedChemical = widget.chemicalSelection!.chemical;
+            _volumeController.text = widget.chemicalSelection!.volume
+                .toString();
+            _frequencyController.text = widget.chemicalSelection!.frequency
+                .toString();
+            _updateDisplayedProperties(_selectedChemical);
+          }
+        });
+      }
     });
   }
 
@@ -85,7 +96,7 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chemical Calculator'),
+        title: Text(_isEditing ? 'Edit Chemical' : 'Add Chemical'),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -97,7 +108,6 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 DropdownSearch<Chemical>(
-                  // Use 'items' for a local list
                   items: _chemicalService.chemicals,
                   itemAsString: (Chemical? u) => u?.name ?? '',
                   onChanged: (Chemical? data) =>
@@ -105,8 +115,6 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
                   selectedItem: _selectedChemical,
                   validator: (value) =>
                       value == null ? 'Please choose a chemical' : null,
-
-                  // Props for the popup menu
                   popupProps: PopupProps.menu(
                     showSearchBox: true,
                     searchFieldProps: TextFieldProps(
@@ -128,8 +136,6 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
                         ),
                       );
                     },
-
-                    // Set the background color for the popup list
                     menuProps: MenuProps(
                       backgroundColor: const Color(
                         0xFF0D7AC8,
@@ -137,7 +143,6 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-
                   dropdownDecoratorProps: DropDownDecoratorProps(
                     baseStyle: const TextStyle(
                       color: Colors.white,
@@ -147,7 +152,10 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
                       'Choose chemical',
                     ),
                   ),
-                  dropdownButtonProps: DropdownButtonProps(color: Colors.white),
+                  dropdownButtonProps: const DropdownButtonProps(
+                    color: Colors.white,
+                  ),
+                  enabled: !_isEditing,
                 ),
                 const SizedBox(height: 16),
                 _buildTextFormField(_volumeController, 'Volume (ml)'),
