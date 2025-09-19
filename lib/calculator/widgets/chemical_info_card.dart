@@ -3,28 +3,52 @@ import '../../models/chemical.dart'; // Adjust import path as needed
 
 class ChemicalInfoCard extends StatelessWidget {
   final ChemicalSelection selection;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
-  const ChemicalInfoCard({super.key, required this.selection});
+  const ChemicalInfoCard({
+    super.key,
+    required this.selection,
+    required this.onEdit,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white24),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            selection.chemical.name,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                selection.chemical.name,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: onEdit,
+                    icon: const Icon(Icons.edit, color: Colors.white),
+                  ),
+                  IconButton(
+                    onPressed: onDelete,
+                    icon: const Icon(Icons.delete, color: Colors.white),
+                  ),
+                ],
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           _buildInfoRow('Volume:', '${selection.volume} ml'),
@@ -48,7 +72,7 @@ class ChemicalInfoCard extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontSize: 14,
             ),
           ),

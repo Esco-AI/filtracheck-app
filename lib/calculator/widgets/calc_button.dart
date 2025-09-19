@@ -14,7 +14,7 @@ class CalcButton extends StatelessWidget {
       child: FilledButton.tonal(
         onPressed: onPressed,
         style: FilledButton.styleFrom(
-          backgroundColor: Colors.white.withOpacity(0.28),
+          backgroundColor: Colors.white.withValues(alpha: 0.28),
           foregroundColor: Colors.white,
           shape: const StadiumBorder(),
           textStyle: const TextStyle(
