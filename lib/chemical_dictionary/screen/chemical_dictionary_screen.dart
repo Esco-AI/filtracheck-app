@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart';
 import '../../models/chemical.dart';
 import '../../services/chemical_service.dart';
 import '../../widgets/bottom_navigation_bar.dart';
+import '../widgets/action_chip.dart';
+import '../widgets/badge.dart';
+import '../widgets/chemical_card.dart';
+import '../widgets/detail_row.dart';
+import '../widgets/empty_state.dart';
+import '../widgets/frosted.dart';
+import '../widgets/gradient_background.dart';
+import '../widgets/search_bar.dart';
+import '../widgets/skeleton_card.dart';
 
 class ChemicalDictionaryScreen extends StatefulWidget {
   const ChemicalDictionaryScreen({super.key});
@@ -14,9 +23,12 @@ class ChemicalDictionaryScreen extends StatefulWidget {
 
 class _ChemicalDictionaryScreenState extends State<ChemicalDictionaryScreen> {
   final ChemicalService _chemicalService = ChemicalService();
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocus = FocusNode();
+
   List<Chemical> _chemicals = [];
   List<Chemical> _filteredChemicals = [];
-  final TextEditingController _searchController = TextEditingController();
+  bool _loading = true;
 
   @override
   void initState() {
@@ -26,18 +38,25 @@ class _ChemicalDictionaryScreenState extends State<ChemicalDictionaryScreen> {
   }
 
   Future<void> _loadChemicals() async {
+    setState(() => _loading = true);
     await _chemicalService.initialize();
-    setState(() {
-      _chemicals = _chemicalService.chemicals;
-      _filteredChemicals = _chemicals;
-    });
+    _chemicals = _chemicalService.chemicals;
+    _filteredChemicals = _chemicals;
+    setState(() => _loading = false);
   }
 
   void _filterChemicals() {
-    final query = _searchController.text.toLowerCase();
+    final q = _searchController.text.trim().toLowerCase();
+    if (q.isEmpty) {
+      setState(() => _filteredChemicals = _chemicals);
+      return;
+    }
     setState(() {
-      _filteredChemicals = _chemicals.where((chemical) {
-        return chemical.name.toLowerCase().contains(query);
+      _filteredChemicals = _chemicals.where((c) {
+        final name = c.name.toLowerCase();
+        final cas = c.casNo.toLowerCase();
+        final formula = c.formula.toLowerCase();
+        return name.contains(q) || cas.contains(q) || formula.contains(q);
       }).toList();
     });
   }
@@ -45,44 +64,75 @@ class _ChemicalDictionaryScreenState extends State<ChemicalDictionaryScreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    _searchFocus.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
         title: const Text(
           'Chemical Dictionary',
-          style: TextStyle(fontWeight: FontWeight.w700),
+          style: TextStyle(fontWeight: FontWeight.w800),
         ),
-        centerTitle: true,
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search Chemical',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.grey[200],
+          const GradientBackground(),
+          SafeArea(
+            child: RefreshIndicator.adaptive(
+              onRefresh: _loadChemicals,
+              edgeOffset: 140,
+              child: CustomScrollView(
+                slivers: [
+                  const SliverToBoxAdapter(child: SizedBox(height: 8)),
+                  SliverToBoxAdapter(
+                    child: FrostedSearchBar(
+                      controller: _searchController,
+                      focusNode: _searchFocus,
+                      onClear: () {
+                        _searchController.clear();
+                        _filterChemicals();
+                      },
+                    ),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 8)),
+                  if (_loading)
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => const SkeletonCard(),
+                        childCount: 8,
+                      ),
+                    )
+                  else if (_filteredChemicals.isEmpty)
+                    const SliverToBoxAdapter(child: EmptyState())
+                  else
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final chemical = _filteredChemicals[index];
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            top: 8,
+                            left: 16,
+                            right: 16,
+                            bottom: index == _filteredChemicals.length - 1
+                                ? 24
+                                : 8,
+                          ),
+                          child: ChemicalCard(
+                            chemical: chemical,
+                            onTap: () => _showDetails(context, chemical),
+                          ),
+                        );
+                      }, childCount: _filteredChemicals.length),
+                    ),
+                ],
               ),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _filteredChemicals.length,
-              itemBuilder: (context, index) {
-                final chemical = _filteredChemicals[index];
-                return ChemicalDictionaryCard(chemical: chemical);
-              },
             ),
           ),
         ],
@@ -90,65 +140,96 @@ class _ChemicalDictionaryScreenState extends State<ChemicalDictionaryScreen> {
       bottomNavigationBar: const AppBottomNav(currentIndex: 0),
     );
   }
-}
 
-class ChemicalDictionaryCard extends StatelessWidget {
-  final Chemical chemical;
-
-  const ChemicalDictionaryCard({super.key, required this.chemical});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: const Color(0xFF3AADEA),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildInfoRow('CAS Number:', chemical.casNo),
-            _buildInfoRow('Chemical Name:', chemical.name),
-            _buildInfoRow('Formula:', chemical.formula),
-            _buildInfoRow(
-              'Density:',
-              chemical.properties['SPECIFIC GRAVITY']?.toString() ?? 'N/A',
-            ),
-            _buildInfoRow(
-              'Molecular Weight:',
-              chemical.properties['MOLECULAR WEIGHT (MW)']?.toString() ?? 'N/A',
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+  void _showDetails(BuildContext context, Chemical c) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return FrostedSheet(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 42,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    BadgePill(text: c.casNo.isEmpty ? 'No CAS' : c.casNo),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        c.name,
+                        textAlign: TextAlign.right,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                DetailRow(
+                  label: 'Formula',
+                  value: c.formula.isEmpty ? '—' : c.formula,
+                ),
+                const SizedBox(height: 8),
+                DetailRow(
+                  label: 'Density (SG)',
+                  value: (c.properties['SPECIFIC GRAVITY'] ?? '—').toString(),
+                ),
+                const SizedBox(height: 8),
+                DetailRow(
+                  label: 'Molecular Weight',
+                  value: (c.properties['MOLECULAR WEIGHT (MW)'] ?? '—')
+                      .toString(),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    CustomActionChip(
+                      icon: Icons.copy_all_rounded,
+                      label: 'Copy CAS',
+                      onTap: () {
+                        if (c.casNo.isEmpty) return;
+                        Clipboard.setData(ClipboardData(text: c.casNo));
+                        Navigator.of(context).maybePop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('CAS copied')),
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 10),
+                    CustomActionChip(
+                      icon: Icons.science_outlined,
+                      label: 'Copy Formula',
+                      onTap: () {
+                        if (c.formula.isEmpty) return;
+                        Clipboard.setData(ClipboardData(text: c.formula));
+                        Navigator.of(context).maybePop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Formula copied')),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              value,
-              textAlign: TextAlign.right,
-              style: const TextStyle(color: Colors.white),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
