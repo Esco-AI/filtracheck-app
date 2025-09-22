@@ -16,37 +16,48 @@ class ChemicalInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.25),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header Row
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                selection.chemical.name,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: Text(
+                  selection.chemical.name,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
               _HeaderActions(onEdit: onEdit, onDelete: onDelete),
             ],
           ),
+          const SizedBox(height: 12),
 
-          const SizedBox(height: 8),
-          _buildInfoRow('Volume:', '${selection.volume} ml'),
-          _buildInfoRow('Frequency:', '${selection.frequency}/month'),
-          _buildInfoRow('Density:', selection.density),
-          _buildInfoRow('%Capacity:', '0.00'),
-          _buildInfoRow('Mass Evaporated/month:', '0.00'),
-          _buildInfoRow('Type of Filter:', selection.filterType),
+          // Info Rows
+          _buildInfoRow('Volume', '${selection.volume} ml'),
+          _buildInfoRow('Frequency', '${selection.frequency}/month'),
+          _buildInfoRow('Density', selection.density),
+          _buildInfoRow('% Capacity', '0.00'),
+          _buildInfoRow('Mass Evap./month', '0.00'),
+          _buildInfoRow('Type of Filter', selection.filterType),
         ],
       ),
     );
@@ -54,15 +65,17 @@ class ChemicalInfoCard extends StatelessWidget {
 
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.8),
-              fontSize: 14,
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.75),
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           Text(
@@ -70,7 +83,7 @@ class ChemicalInfoCard extends StatelessWidget {
             style: const TextStyle(
               color: Colors.white,
               fontSize: 14,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],
@@ -79,78 +92,82 @@ class ChemicalInfoCard extends StatelessWidget {
   }
 }
 
+// --- ACTION BUTTONS ---
 class _HeaderActions extends StatelessWidget {
   const _HeaderActions({required this.onEdit, required this.onDelete});
-
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
-  static const double _height = 34;
   static const double _radius = 10;
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisSize: MainAxisSize.min,
       children: [
-        Tooltip(
-          message: 'Delete',
-          child: Material(
-            color: Colors.red.withValues(alpha: 0.3),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(_radius),
-              side: const BorderSide(color: Colors.red),
-            ),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(_radius),
-              onTap: onDelete,
-              child: SizedBox(
-                height: _height,
-                width: _height,
-                child: const Center(
-                  child: Icon(
-                    Icons.delete_outline,
-                    size: 20,
-                    color: Colors.redAccent,
-                  ),
-                ),
-              ),
-            ),
-          ),
+        _buildIconButton(
+          icon: Icons.delete_outline,
+          tooltip: 'Delete',
+          bg: Colors.red.withValues(alpha: 0.15),
+          border: Colors.redAccent,
+          iconColor: Colors.redAccent,
+          onTap: onDelete,
         ),
         const SizedBox(width: 8),
-
-        Material(
-          color: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(_radius),
-            side: const BorderSide(color: Colors.white),
-          ),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(_radius),
-            onTap: onEdit,
-            child: const _EditLabel(),
-          ),
-        ),
+        _buildTextButton('Edit', onEdit),
       ],
     );
   }
-}
 
-class _EditLabel extends StatelessWidget {
-  const _EditLabel();
+  Widget _buildIconButton({
+    required IconData icon,
+    required String tooltip,
+    required Color bg,
+    required Color border,
+    required Color iconColor,
+    required VoidCallback onTap,
+  }) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: bg,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(_radius),
+          side: BorderSide(color: border),
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(_radius),
+          onTap: onTap,
+          child: SizedBox(
+            height: 34,
+            width: 34,
+            child: Icon(icon, size: 20, color: iconColor),
+          ),
+        ),
+      ),
+    );
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      child: const Text(
-        'Edit',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.2,
+  Widget _buildTextButton(String text, VoidCallback onTap) {
+    return Material(
+      color: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(_radius),
+        side: const BorderSide(color: Colors.white),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(_radius),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.2,
+            ),
+          ),
         ),
       ),
     );

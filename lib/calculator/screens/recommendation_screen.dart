@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../widgets/bottom_navigation_bar.dart';
-import '../widgets/gradient_form_container.dart';
+import '../../chemical_dictionary/widgets/gradient_background.dart';
+import '../../chemical_dictionary/widgets/frosted.dart';
 
 class RecommendationScreen extends StatelessWidget {
   final Map<String, dynamic> recommendation;
@@ -12,25 +13,57 @@ class RecommendationScreen extends StatelessWidget {
     final bool isDucted = recommendation['isDucted'] ?? false;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
+      extendBody: true,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
         title: const Text(
           'Recommendation Result',
-          style: TextStyle(fontWeight: FontWeight.w700),
+          style: TextStyle(fontWeight: FontWeight.w800),
         ),
-        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: const Alignment(0, -1.2),
+              end: const Alignment(0, 1),
+              colors: [
+                Colors.black.withValues(alpha: 0.25),
+                Colors.transparent,
+              ],
+            ),
+          ),
+        ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: GradientFormContainer(
-          child: isDucted
-              ? _buildDuctedRecommendation(context)
-              : _buildDuctlessRecommendation(context),
-        ),
+      body: Stack(
+        children: [
+          const GradientBackground(),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+              child: Frosted(
+                borderRadius: 24,
+                blur: 16,
+                tint: Colors.white.withValues(alpha: 0.06),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
+                  child: isDucted
+                      ? _buildDuctedRecommendation(context)
+                      : _buildDuctlessRecommendation(context),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: const AppBottomNav(currentIndex: 0),
     );
   }
 
+  // ----- Ductless -----
   Widget _buildDuctlessRecommendation(BuildContext context) {
     final String? mainFilter = recommendation['mainFilter'];
     final String? secondaryFilter = recommendation['secondaryFilter'];
@@ -44,19 +77,19 @@ class RecommendationScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildResultHeader('Ductless Fume Hood'),
+        const _SectionHeader(title: 'Ductless Fume Hood'),
         const SizedBox(height: 16),
-        _buildInfoRow('No. of Fume Hood Unit:', '1'),
-        _buildInfoRow('No. of Filter:', filterCount.toString()),
-        _buildInfoRow(
+        _infoRow('No. of Fume Hood Unit:', '1'),
+        _infoRow('No. of Filter:', filterCount.toString()),
+        _infoRow(
           'Main Filter:',
           mainFilter != null ? 'Type $mainFilter' : 'None',
         ),
-        _buildInfoRow(
+        _infoRow(
           'Secondary Filter:',
           secondaryFilter != null ? 'Type $secondaryFilter' : 'None',
         ),
-        _buildInfoRow('Fume Hood Model:', 'ADC-B or D/SPD/SPB'), // As per image
+        _infoRow('Fume Hood Model:', 'ADC-B or D/SPD/SPB'),
         if (unsupportedFilters.isNotEmpty) ...[
           const SizedBox(height: 16),
           const Divider(color: Colors.white24),
@@ -79,6 +112,7 @@ class RecommendationScreen extends StatelessWidget {
     );
   }
 
+  // ----- Ducted -----
   Widget _buildDuctedRecommendation(BuildContext context) {
     final List<String> reasons = recommendation['reasons'] ?? [];
     final List<String> ductedModels = recommendation['ductedModels'] ?? [];
@@ -88,13 +122,13 @@ class RecommendationScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildResultHeader('Ducted Fume Hood'),
+        const _SectionHeader(title: 'Ducted Fume Hood'),
         const SizedBox(height: 16),
-        _buildInfoRow('No. of Fume Hood Unit:', '1'),
-        _buildInfoRow('No. of Filter:', 'N/A'),
-        _buildInfoRow('Main Filter:', 'None'),
-        _buildInfoRow('Secondary Filter:', 'None'),
-        _buildInfoRow(
+        _infoRow('No. of Fume Hood Unit:', '1'),
+        _infoRow('No. of Filter:', 'N/A'),
+        _infoRow('Main Filter:', 'None'),
+        _infoRow('Secondary Filter:', 'None'),
+        _infoRow(
           'Fume Hood Model:',
           ductedModels.isNotEmpty
               ? ductedModels.join(' or ')
@@ -147,29 +181,19 @@ class RecommendationScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildResultHeader(String title) {
-    return Text(
-      title,
-      textAlign: TextAlign.center,
-      style: const TextStyle(
-        color: Colors.white,
-        fontSize: 22,
-        fontWeight: FontWeight.bold,
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
+  // ----- Shared bits -----
+  Widget _infoRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.85),
-              fontSize: 15,
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.85),
+                fontSize: 15,
+              ),
             ),
           ),
           Text(
@@ -182,6 +206,39 @@ class RecommendationScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  const _SectionHeader({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          height: 4,
+          width: 40,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF7E57C2), Color(0xFFEC407A)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.all(Radius.circular(2)),
+          ),
+        ),
+      ],
     );
   }
 }

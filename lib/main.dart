@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home/screen/home_screen.dart';
+import 'home/screens/home_screen.dart';
 
 void main() {
   runApp(const FiltraCheckApp());
