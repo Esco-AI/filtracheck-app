@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../home/screen/home_screen.dart';
+import '../home/screens/home_screen.dart';
 
 class AppBottomNav extends StatelessWidget {
   final int currentIndex;

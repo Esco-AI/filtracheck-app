@@ -1,13 +1,17 @@
+import 'package:filtracheck_v2/calculator/screens/recommendation_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../../models/chemical.dart';
 import '../../services/recommendation_service.dart';
 import '../../widgets/bottom_navigation_bar.dart';
+import '../../chemical_dictionary/widgets/gradient_background.dart';
+import '../../chemical_dictionary/widgets/frosted.dart';
 import 'add_chemical_screen.dart';
 import '../widgets/calc_button.dart';
 import '../widgets/chemical_info_card.dart';
+import '../widgets/calc_section_header.dart';
+import '../widgets/calc_intro_view.dart';
+import '../widgets/calc_heating_selector.dart';
 import '../widgets/heating_selector.dart' as ducted;
-import 'recommendation_screen.dart';
 
 class CalculatorIntroScreen extends StatefulWidget {
   const CalculatorIntroScreen({super.key});
@@ -18,7 +22,6 @@ class CalculatorIntroScreen extends StatefulWidget {
 
 class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
   final List<ChemicalSelection> _selectedChemicals = [];
-
   bool _involvesHeating = false;
 
   final Map<String, bool> _checklistValues = {
@@ -41,19 +44,16 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
             AddChemicalScreen(chemicalSelection: chemicalToEdit),
       ),
     );
+    if (result == null) return;
 
-    if (result != null) {
-      setState(() {
-        if (chemicalToEdit != null) {
-          final index = _selectedChemicals.indexOf(chemicalToEdit);
-          if (index != -1) {
-            _selectedChemicals[index] = result;
-          }
-        } else {
-          _selectedChemicals.add(result);
-        }
-      });
-    }
+    setState(() {
+      if (chemicalToEdit != null) {
+        final index = _selectedChemicals.indexOf(chemicalToEdit);
+        if (index != -1) _selectedChemicals[index] = result;
+      } else {
+        _selectedChemicals.add(result);
+      }
+    });
   }
 
   void _evaluateChemicals() {
@@ -63,14 +63,12 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
       );
       return;
     }
-
     final recommendation = RecommendationService.evaluate(
       _selectedChemicals,
       _involvesHeating,
       _checklistValues,
       _selectedPreference,
     );
-
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) =>
@@ -79,189 +77,101 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
     );
   }
 
-  void _deleteChemical(int index) {
-    setState(() {
-      _selectedChemicals.removeAt(index);
-    });
-  }
+  void _deleteChemical(int index) =>
+      setState(() => _selectedChemicals.removeAt(index));
 
   @override
   Widget build(BuildContext context) {
-    final bool hasChemicals = _selectedChemicals.isNotEmpty;
+    final hasChemicals = _selectedChemicals.isNotEmpty;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
+      extendBody: true,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
         title: const Text(
           'Chemical Calculator',
-          style: TextStyle(fontWeight: FontWeight.w700),
-        ),
-        centerTitle: true,
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF3AADEA), Color(0xFF0D7AC8)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(28),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 16,
-                  offset: Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                if (!hasChemicals) _buildIntroView(),
-                if (hasChemicals) _buildChemicalsList(),
-                if (hasChemicals) ...[
-                  const SizedBox(height: 24),
-                  _buildHeatingSelector(),
-                  if (_involvesHeating)
-                    ducted.HeatingChecklist(
-                      checklistValues: _checklistValues,
-                      onChanged: (key, value) {
-                        setState(() {
-                          _checklistValues[key] = value;
-                          if (_checklistValues.values.any((v) => v)) {
-                            _selectedPreference = null;
-                          }
-                        });
-                      },
-                      selectedPreference: _selectedPreference,
-                      onPreferenceChanged: (val) {
-                        setState(() {
-                          if (_selectedPreference == val) {
-                            _selectedPreference = null;
-                          } else {
-                            _selectedPreference = val;
-                          }
-                        });
-                      },
-                    ),
-                ],
-                const SizedBox(height: 24),
-                CalcButton(
-                  label: 'Add Chemical',
-                  onPressed: () => _navigateToAddChemical(),
-                ),
-                const SizedBox(height: 12),
-                CalcButton(label: 'Evaluate', onPressed: _evaluateChemicals),
-              ],
-            ),
-          ),
+          style: TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
-      bottomNavigationBar: const AppBottomNav(currentIndex: 0),
-    );
-  }
-
-  Widget _buildHeatingSelector() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white24),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
         children: [
-          const Expanded(
-            child: Text(
-              'Does it involve heating?',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+          const GradientBackground(),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Frosted(
+                borderRadius: 24,
+                blur: 16,
+                tint: Colors.white.withValues(alpha: 0.06),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (!hasChemicals) const CalcIntroView(),
+                      if (hasChemicals) ...[
+                        const CalcSectionHeader(title: 'Selected Chemicals'),
+                        const SizedBox(height: 12),
+                        ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: _selectedChemicals.length,
+                          itemBuilder: (_, i) => ChemicalInfoCard(
+                            selection: _selectedChemicals[i],
+                            onEdit: () => _navigateToAddChemical(
+                              chemicalToEdit: _selectedChemicals[i],
+                            ),
+                            onDelete: () => _deleteChemical(i),
+                          ),
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 12),
+                        ),
+                        const SizedBox(height: 20),
+                        const CalcSectionHeader(title: 'Preferences'),
+                        const SizedBox(height: 12),
+                        CalcHeatingSelector(
+                          involvesHeating: _involvesHeating,
+                          checklistValues: _checklistValues,
+                          selectedPreference: _selectedPreference,
+                          onHeatingChanged: (v) =>
+                              setState(() => _involvesHeating = v),
+                          onChecklistChanged: (k, v) => setState(() {
+                            _checklistValues[k] = v;
+                            if (_checklistValues.values.any((v) => v)) {
+                              _selectedPreference = null;
+                            }
+                          }),
+                          onPreferenceChanged: (val) => setState(() {
+                            _selectedPreference = _selectedPreference == val
+                                ? null
+                                : val;
+                          }),
+                        ),
+                      ],
+                      const SizedBox(height: 24),
+                      CalcButton(
+                        label: 'Add Chemical',
+                        onPressed: () => _navigateToAddChemical(),
+                      ),
+                      const SizedBox(height: 12),
+                      CalcButton(
+                        label: 'Evaluate',
+                        onPressed: _evaluateChemicals,
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
-          ),
-          ToggleButtons(
-            isSelected: [_involvesHeating, !_involvesHeating],
-            onPressed: (index) {
-              setState(() {
-                _involvesHeating = index == 0;
-                if (!_involvesHeating) {
-                  for (final k in _checklistValues.keys) {
-                    _checklistValues[k] = false;
-                  }
-                  _selectedPreference = null;
-                }
-              });
-            },
-            borderRadius: BorderRadius.circular(8),
-            selectedColor: Colors.white,
-            color: Colors.white,
-            fillColor: Colors.white.withValues(alpha: 0.2),
-            splashColor: Colors.white.withValues(alpha: 0.4),
-            borderColor: Colors.white,
-            selectedBorderColor: Colors.white,
-            disabledBorderColor: Colors.white54,
-            children: const [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Text('Yes'),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Text('No'),
-              ),
-            ],
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildIntroView() {
-    return Column(
-      children: [
-        const Text(
-          'Kindly list down all chemicals that you intend to use inside the fume hood.',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            height: 1.35,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 24),
-        SizedBox(
-          height: 180,
-          width: 220,
-          child: SvgPicture.asset(
-            'assets/images/calculator-chemical-icon.svg',
-            fit: BoxFit.contain,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildChemicalsList() {
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: _selectedChemicals.length,
-      itemBuilder: (context, index) {
-        final selection = _selectedChemicals[index];
-        return ChemicalInfoCard(
-          selection: selection,
-          onEdit: () => _navigateToAddChemical(chemicalToEdit: selection),
-          onDelete: () => _deleteChemical(index),
-        );
-      },
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 0),
     );
   }
 }

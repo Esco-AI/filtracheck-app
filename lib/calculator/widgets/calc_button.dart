@@ -9,20 +9,46 @@ class CalcButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 44,
+      height: 48,
       width: 240,
-      child: FilledButton.tonal(
-        onPressed: onPressed,
-        style: FilledButton.styleFrom(
-          backgroundColor: Colors.white.withValues(alpha: 0.28),
-          foregroundColor: Colors.white,
-          shape: const StadiumBorder(),
-          textStyle: const TextStyle(
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.2,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF3AADEA), Color(0xFF0D7AC8)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(999),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0D7AC8).withValues(alpha: 0.4),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            shape: const StadiumBorder(),
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.4,
+              fontSize: 16,
+            ),
+          ),
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.4,
+              fontSize: 16,
+            ),
           ),
         ),
-        child: Text(label),
       ),
     );
   }

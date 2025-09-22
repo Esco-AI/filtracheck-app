@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../chemical_dictionary/screen/chemical_dictionary_screen.dart';
+import '../../chemical_dictionary/screens/chemical_dictionary_screen.dart';
 import '../../chemical_dictionary/widgets/frosted.dart';
 import '../../calculator/screens/calculator_intro_screen.dart';
 import 'feature_tile.dart';

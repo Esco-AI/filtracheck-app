@@ -14,23 +14,41 @@ class FormActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final gradient = isPrimary
+        ? const LinearGradient(
+            colors: [Color(0xFF7E57C2), Color(0xFFEC407A)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          )
+        : const LinearGradient(
+            colors: [Color(0xFF3AADEA), Color(0xFF0D7AC8)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          );
+
     return SizedBox(
       height: 50,
-      child: FilledButton(
-        onPressed: onPressed,
-        style: FilledButton.styleFrom(
-          backgroundColor: Colors.white.withValues(
-            alpha: isPrimary ? 0.28 : 0.15,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            shape: const StadiumBorder(),
           ),
-          foregroundColor: Colors.white,
-          shape: const StadiumBorder(),
-          textStyle: const TextStyle(
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.2,
-            fontSize: 16,
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+            ),
           ),
         ),
-        child: Text(label),
       ),
     );
   }
