@@ -1,3 +1,4 @@
+import 'package:filtracheck_v2/chemical_dictionary/screen/chemical_dictionary_screen.dart';
 import 'package:flutter/material.dart';
 import '../../calculator/screens/calculator_intro_screen.dart';
 import 'feature_tile.dart';
@@ -47,7 +48,13 @@ class FeaturePanel extends StatelessWidget {
               icon: Icons.science_rounded,
               label: 'Chemical\nDictionary',
               width: itemWidth,
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const ChemicalDictionaryScreen(),
+                  ),
+                );
+              },
             ),
             FeatureTile(
               icon: Icons.inventory_2_rounded,
