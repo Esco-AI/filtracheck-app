@@ -13,15 +13,12 @@ class CalcButton extends StatelessWidget {
       width: 240,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF3AADEA), Color(0xFF0D7AC8)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: Colors.white.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF0D7AC8).withValues(alpha: 0.4),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 18,
               offset: const Offset(0, 8),
             ),

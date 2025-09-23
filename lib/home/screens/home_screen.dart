@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../chemical_dictionary/widgets/gradient_background.dart';
 import '../widgets/feature_panel.dart';
 import '../widgets/about_card.dart';
 import '../widgets/news_card.dart';
@@ -11,28 +10,18 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white, // Changed to white
       extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         title: const Text(
           'Home',
-          style: TextStyle(fontWeight: FontWeight.w800),
-        ),
-        // Frosted top bar feel
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: const Alignment(0, -1.2),
-              end: const Alignment(0, 1),
-              colors: [
-                Colors.black.withValues(alpha: 0.25),
-                Colors.transparent,
-              ],
-            ),
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            color: Colors.blue, // Changed to blue
           ),
         ),
       ),
@@ -47,19 +36,14 @@ class _HomeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        const GradientBackground(),
-        ListView(
-          padding: const EdgeInsets.fromLTRB(16, 112, 16, 16),
-          children: const [
-            FeaturePanel(),
-            SizedBox(height: 16),
-            AboutCard(),
-            SizedBox(height: 16),
-            _NewsfeedSection(),
-          ],
-        ),
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 112, 16, 16),
+      children: const [
+        FeaturePanel(),
+        SizedBox(height: 16),
+        AboutCard(),
+        SizedBox(height: 16),
+        _NewsfeedSection(),
       ],
     );
   }
@@ -76,7 +60,7 @@ class _NewsfeedSection extends StatelessWidget {
         Text(
           'Newsfeed',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: Colors.white,
+            color: Colors.black87, // Changed for visibility on white
             fontWeight: FontWeight.w800,
           ),
         ),

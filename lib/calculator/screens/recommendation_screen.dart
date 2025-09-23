@@ -1,6 +1,7 @@
+// lib/calculator/screens/recommendation_screen.dart
+
 import 'package:flutter/material.dart';
 import '../../widgets/bottom_navigation_bar.dart';
-import '../../chemical_dictionary/widgets/gradient_background.dart';
 import '../../chemical_dictionary/widgets/frosted.dart';
 
 class RecommendationScreen extends StatelessWidget {
@@ -13,51 +14,38 @@ class RecommendationScreen extends StatelessWidget {
     final bool isDucted = recommendation['isDucted'] ?? false;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white, // Changed background to white
       extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white, // Changed AppBar to white
         elevation: 0,
         centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.blue), // Blue back arrow
         title: const Text(
           'Recommendation Result',
-          style: TextStyle(fontWeight: FontWeight.w800),
-        ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: const Alignment(0, -1.2),
-              end: const Alignment(0, 1),
-              colors: [
-                Colors.black.withValues(alpha: 0.25),
-                Colors.transparent,
-              ],
-            ),
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            color: Colors.blue, // Blue title
           ),
         ),
       ),
-      body: Stack(
-        children: [
-          const GradientBackground(),
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-              child: Frosted(
-                borderRadius: 24,
-                blur: 16,
-                tint: Colors.white.withValues(alpha: 0.06),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
-                  child: isDucted
-                      ? _buildDuctedRecommendation(context)
-                      : _buildDuctlessRecommendation(context),
-                ),
-              ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+          child: Frosted(
+            borderRadius: 24,
+            blur: 16,
+            tint: Colors.blue, // Changed card background to blue
+            border: Border.all(color: Colors.blue.shade200),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
+              child: isDucted
+                  ? _buildDuctedRecommendation(context)
+                  : _buildDuctlessRecommendation(context),
             ),
           ),
-        ],
+        ),
       ),
       bottomNavigationBar: const AppBottomNav(currentIndex: 0),
     );
@@ -226,18 +214,6 @@ class _SectionHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        Container(
-          height: 4,
-          width: 40,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF7E57C2), Color(0xFFEC407A)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.all(Radius.circular(2)),
-          ),
-        ),
       ],
     );
   }

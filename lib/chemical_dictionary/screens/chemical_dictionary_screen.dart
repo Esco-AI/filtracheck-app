@@ -9,7 +9,6 @@ import '../widgets/chemical_card.dart';
 import '../widgets/detail_row.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/frosted.dart';
-import '../widgets/gradient_background.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/skeleton_card.dart';
 
@@ -71,83 +70,81 @@ class _ChemicalDictionaryScreenState extends State<ChemicalDictionaryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
         centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.blue),
         title: const Text(
           'Chemical Dictionary',
-          style: TextStyle(fontWeight: FontWeight.w800),
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            color: Colors.blue,
+          ),
         ),
       ),
-      body: Stack(
-        children: [
-          const GradientBackground(),
-          SafeArea(
-            child: RefreshIndicator.adaptive(
-              onRefresh: _loadChemicals,
-              edgeOffset: 140,
-              child: CustomScrollView(
-                slivers: [
-                  const SliverToBoxAdapter(child: SizedBox(height: 8)),
-                  SliverToBoxAdapter(
-                    child: FrostedSearchBar(
-                      controller: _searchController,
-                      focusNode: _searchFocus,
-                      onClear: () {
-                        _searchController.clear();
-                        _filterChemicals();
-                      },
-                    ),
-                  ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 8)),
-                  if (_loading)
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) => const SkeletonCard(),
-                        childCount: 8,
-                      ),
-                    )
-                  else if (_filteredChemicals.isEmpty)
-                    const SliverToBoxAdapter(child: EmptyState())
-                  else
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        final chemical = _filteredChemicals[index];
-                        return Padding(
-                          padding: EdgeInsets.only(
-                            top: 8,
-                            left: 16,
-                            right: 16,
-                            bottom: index == _filteredChemicals.length - 1
-                                ? 24
-                                : 8,
-                          ),
-                          child: ChemicalCard(
-                            chemical: chemical,
-                            onTap: () => _showDetails(context, chemical),
-                          ),
-                        );
-                      }, childCount: _filteredChemicals.length),
-                    ),
-                ],
+      body: SafeArea(
+        child: RefreshIndicator.adaptive(
+          onRefresh: _loadChemicals,
+          edgeOffset: 140,
+          child: CustomScrollView(
+            slivers: [
+              const SliverToBoxAdapter(child: SizedBox(height: 8)),
+              SliverToBoxAdapter(
+                child: FrostedSearchBar(
+                  controller: _searchController,
+                  focusNode: _searchFocus,
+                  onClear: () {
+                    _searchController.clear();
+                    _filterChemicals();
+                  },
+                ),
               ),
-            ),
+              const SliverToBoxAdapter(child: SizedBox(height: 8)),
+              if (_loading)
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => const SkeletonCard(),
+                    childCount: 8,
+                  ),
+                )
+              else if (_filteredChemicals.isEmpty)
+                const SliverToBoxAdapter(child: EmptyState())
+              else
+                SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final chemical = _filteredChemicals[index];
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        top: 8,
+                        left: 16,
+                        right: 16,
+                        bottom: index == _filteredChemicals.length - 1 ? 24 : 8,
+                      ),
+                      child: ChemicalCard(
+                        chemical: chemical,
+                        onTap: () => _showDetails(context, chemical),
+                      ),
+                    );
+                  }, childCount: _filteredChemicals.length),
+                ),
+            ],
           ),
-        ],
+        ),
       ),
       bottomNavigationBar: const AppBottomNav(currentIndex: 0),
     );
   }
 
   void _showDetails(BuildContext context, Chemical c) {
+    // This bottom sheet will need a redesign later if we continue
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      useSafeArea: false, // we'll handle SafeArea manually
+      useSafeArea: false,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         final mq = MediaQuery.of(ctx);
@@ -184,6 +181,7 @@ class _ChemicalDictionaryScreenState extends State<ChemicalDictionaryScreen> {
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
+                              color: Colors.white,
                             ),
                           ),
                         ),

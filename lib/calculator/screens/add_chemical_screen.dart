@@ -3,7 +3,6 @@ import '../../models/chemical.dart';
 import '../../services/chemical_service.dart';
 import '../widgets/form_action_button.dart';
 import '../../widgets/bottom_navigation_bar.dart';
-import '../../chemical_dictionary/widgets/gradient_background.dart';
 import '../../chemical_dictionary/widgets/frosted.dart';
 import '../widgets/form_blocks.dart';
 
@@ -96,104 +95,82 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white, // Changed background
       extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white, // Changed AppBar background
         elevation: 0,
         centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.blue),
         title: Text(
           _isEditing ? 'Edit Chemical' : 'Add Chemical',
-          style: const TextStyle(fontWeight: FontWeight.w800),
-        ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: const Alignment(0, -1.2),
-              end: const Alignment(0, 1),
-              colors: [
-                Colors.black.withValues(alpha: 0.25),
-                Colors.transparent,
-              ],
-            ),
+          style: const TextStyle(
+            fontWeight: FontWeight.w800,
+            color: Colors.blue,
           ),
         ),
       ),
-      body: Stack(
-        children: [
-          const GradientBackground(),
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-              child: Frosted(
-                borderRadius: 24,
-                blur: 16,
-                tint: Colors.white.withValues(alpha: 0.06),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const SectionHeader('Chemical Details'),
-                        const SizedBox(height: 12),
-
-                        // Chemical picker
-                        GlassDropdownChemical(
-                          items: _svc.chemicals,
-                          selected: _selected,
-                          onChanged: (c) => _updateDisplayedProperties(c),
-                          enabled: !_isEditing,
-                          validator: (v) =>
-                              v == null ? 'Please choose a chemical' : null,
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Volume / Frequency
-                        GlassTextField(
-                          controller: _volumeCtrl,
-                          label: 'Volume (ml)',
-                          prefixIcon: Icons.local_drink_rounded,
-                          validator: _numValidator,
-                        ),
-                        const SizedBox(height: 12),
-                        GlassTextField(
-                          controller: _freqCtrl,
-                          label: 'Frequency (no. of handlings in month)',
-                          prefixIcon: Icons.repeat_rounded,
-                          validator: _numValidator,
-                        ),
-
-                        const SizedBox(height: 20),
-                        const SectionHeader('Calculated'),
-                        const SizedBox(height: 12),
-                        CalculatedPanel(
-                          density: _density,
-                          filterType: _filterType,
-                        ),
-
-                        const SizedBox(height: 24),
-                        FormActionButton(
-                          label: 'Done',
-                          onPressed: _onDone,
-                          isPrimary: true,
-                        ),
-                        const SizedBox(height: 12),
-                        FormActionButton(
-                          label: 'Cancel',
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                      ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+          child: Frosted(
+            borderRadius: 24,
+            blur: 16,
+            tint: Colors.blue,
+            border: Border.all(color: Colors.blue.shade200),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SectionHeader('Chemical Details'),
+                    const SizedBox(height: 12),
+                    GlassDropdownChemical(
+                      items: _svc.chemicals,
+                      selected: _selected,
+                      onChanged: (c) => _updateDisplayedProperties(c),
+                      enabled: !_isEditing,
+                      validator: (v) =>
+                          v == null ? 'Please choose a chemical' : null,
                     ),
-                  ),
+                    const SizedBox(height: 12),
+                    GlassTextField(
+                      controller: _volumeCtrl,
+                      label: 'Volume (ml)',
+                      prefixIcon: Icons.local_drink_rounded,
+                      validator: _numValidator,
+                    ),
+                    const SizedBox(height: 12),
+                    GlassTextField(
+                      controller: _freqCtrl,
+                      label: 'Frequency (no. of handlings in month)',
+                      prefixIcon: Icons.repeat_rounded,
+                      validator: _numValidator,
+                    ),
+                    const SizedBox(height: 20),
+                    const SectionHeader('Calculated'),
+                    const SizedBox(height: 12),
+                    CalculatedPanel(density: _density, filterType: _filterType),
+                    const SizedBox(height: 24),
+                    FormActionButton(
+                      label: 'Done',
+                      onPressed: _onDone,
+                      isPrimary: true,
+                    ),
+                    const SizedBox(height: 12),
+                    FormActionButton(
+                      label: 'Cancel',
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-        ],
+        ),
       ),
       bottomNavigationBar: const AppBottomNav(currentIndex: 0),
     );

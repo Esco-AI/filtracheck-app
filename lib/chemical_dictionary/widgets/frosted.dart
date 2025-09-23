@@ -1,3 +1,5 @@
+// lib/chemical_dictionary/widgets/frosted.dart
+
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
@@ -7,6 +9,7 @@ class Frosted extends StatelessWidget {
   final double borderRadius;
   final Color? tint;
   final BoxBorder? border;
+  final Gradient? gradient; // Added gradient property
 
   const Frosted({
     super.key,
@@ -15,6 +18,7 @@ class Frosted extends StatelessWidget {
     this.borderRadius = 16,
     this.tint,
     this.border,
+    this.gradient, // Added to constructor
   });
 
   @override
@@ -25,7 +29,10 @@ class Frosted extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: (tint ?? Colors.white.withValues(alpha: 0.06)),
+            gradient: gradient,
+            color: gradient == null
+                ? (tint ?? Colors.white.withValues(alpha: 0.06))
+                : null,
             borderRadius: BorderRadius.circular(borderRadius),
             border: border,
           ),
