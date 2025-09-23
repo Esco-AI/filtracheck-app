@@ -145,87 +145,98 @@ class _ChemicalDictionaryScreenState extends State<ChemicalDictionaryScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      useSafeArea: true,
+      useSafeArea: false, // we'll handle SafeArea manually
       backgroundColor: Colors.transparent,
       builder: (ctx) {
-        return FrostedSheet(
+        final mq = MediaQuery.of(ctx);
+        return SafeArea(
+          top: false,
+          left: false,
+          right: false,
+          bottom: true,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 42,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
+            padding: EdgeInsets.only(bottom: mq.viewInsets.bottom),
+            child: FrostedSheet(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    BadgePill(text: c.casNo.isEmpty ? 'No CAS' : c.casNo),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        c.name,
-                        textAlign: TextAlign.right,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                        ),
+                    Container(
+                      width: 42,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        BadgePill(text: c.casNo.isEmpty ? 'No CAS' : c.casNo),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            c.name,
+                            textAlign: TextAlign.right,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    DetailRow(
+                      label: 'Formula',
+                      value: c.formula.isEmpty ? '—' : c.formula,
+                    ),
+                    const SizedBox(height: 8),
+                    DetailRow(
+                      label: 'Density (SG)',
+                      value: (c.properties['SPECIFIC GRAVITY'] ?? '—')
+                          .toString(),
+                    ),
+                    const SizedBox(height: 8),
+                    DetailRow(
+                      label: 'Molecular Weight',
+                      value: (c.properties['MOLECULAR WEIGHT (MW)'] ?? '—')
+                          .toString(),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        CustomActionChip(
+                          icon: Icons.copy_all_rounded,
+                          label: 'Copy CAS',
+                          onTap: () {
+                            if (c.casNo.isEmpty) return;
+                            Clipboard.setData(ClipboardData(text: c.casNo));
+                            Navigator.of(context).maybePop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('CAS copied')),
+                            );
+                          },
+                        ),
+                        const SizedBox(width: 10),
+                        CustomActionChip(
+                          icon: Icons.science_outlined,
+                          label: 'Copy Formula',
+                          onTap: () {
+                            if (c.formula.isEmpty) return;
+                            Clipboard.setData(ClipboardData(text: c.formula));
+                            Navigator.of(context).maybePop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Formula copied')),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                DetailRow(
-                  label: 'Formula',
-                  value: c.formula.isEmpty ? '—' : c.formula,
-                ),
-                const SizedBox(height: 8),
-                DetailRow(
-                  label: 'Density (SG)',
-                  value: (c.properties['SPECIFIC GRAVITY'] ?? '—').toString(),
-                ),
-                const SizedBox(height: 8),
-                DetailRow(
-                  label: 'Molecular Weight',
-                  value: (c.properties['MOLECULAR WEIGHT (MW)'] ?? '—')
-                      .toString(),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    CustomActionChip(
-                      icon: Icons.copy_all_rounded,
-                      label: 'Copy CAS',
-                      onTap: () {
-                        if (c.casNo.isEmpty) return;
-                        Clipboard.setData(ClipboardData(text: c.casNo));
-                        Navigator.of(context).maybePop();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('CAS copied')),
-                        );
-                      },
-                    ),
-                    const SizedBox(width: 10),
-                    CustomActionChip(
-                      icon: Icons.science_outlined,
-                      label: 'Copy Formula',
-                      onTap: () {
-                        if (c.formula.isEmpty) return;
-                        Clipboard.setData(ClipboardData(text: c.formula));
-                        Navigator.of(context).maybePop();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Formula copied')),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
         );

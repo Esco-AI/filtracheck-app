@@ -72,7 +72,7 @@ class AppBottomNav extends StatelessWidget {
     required bool active,
   }) {
     final gradient = const LinearGradient(
-      colors: [Color(0xFF3AADEA), Color(0xFF0D7AC8)],
+      colors: [Colors.white, Colors.white],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     );
