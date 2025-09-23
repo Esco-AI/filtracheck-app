@@ -1,3 +1,4 @@
+import 'package:filtracheck_v2/contact_us/screens/contact_us_screen.dart';
 import 'package:flutter/material.dart';
 import '../../chemical_dictionary/screens/chemical_dictionary_screen.dart';
 import '../../chemical_dictionary/widgets/frosted.dart';
@@ -56,6 +57,11 @@ class FeaturePanel extends StatelessWidget {
                 icon: Icons.contact_mail_rounded,
                 label: 'Contact',
                 width: itemWidth,
+                onTap: () {
+                  Navigator.of(
+                    context,
+                  ).push(MaterialPageRoute(builder: (_) => ContactUsScreen()));
+                },
               ),
               FeatureTile(
                 icon: Icons.rss_feed_rounded,
