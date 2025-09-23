@@ -52,35 +52,64 @@ class RecommendationService {
     String? mainFilter;
     String? secondaryFilter;
     List<String> unsupportedFilters = [];
+    String ductlessModel = 'Not Applicable';
 
-    if (!defaultIsDucted && distinctFilters.isNotEmpty) {
-      // Create a list of tuples: [filter, score, occurrence, weightedSum]
-      final ranking = distinctFilters.map((key) {
-        final n = filterOccurrenceCounts[key] ?? 0;
-        final s = weightedSumQF[key] ?? 0.0;
-        final score = s * n;
-        return Tuple(key, score, n, s);
-      }).toList();
+    if (!defaultIsDucted) {
+      if (distinctFilters.isNotEmpty) {
+        final ranking = distinctFilters.map((key) {
+          final n = filterOccurrenceCounts[key] ?? 0;
+          final s = weightedSumQF[key] ?? 0.0;
+          final score = s * n;
+          return Tuple(key, score, n, s);
+        }).toList();
 
-      // Sort by score (desc), then occurrence (desc), then sum (desc), then alphabetically
-      ranking.sort((a, b) {
-        int scoreComp = b.item2.compareTo(a.item2);
-        if (scoreComp != 0) return scoreComp;
-        int nComp = b.item3.compareTo(a.item3);
-        if (nComp != 0) return nComp;
-        int sComp = b.item4.compareTo(a.item4);
-        if (sComp != 0) return sComp;
-        return a.item1.compareTo(b.item1);
-      });
+        ranking.sort((a, b) {
+          int scoreComp = b.item2.compareTo(a.item2);
+          if (scoreComp != 0) return scoreComp;
+          int nComp = b.item3.compareTo(a.item3);
+          if (nComp != 0) return nComp;
+          int sComp = b.item4.compareTo(a.item4);
+          if (sComp != 0) return sComp;
+          return a.item1.compareTo(b.item1);
+        });
 
-      if (ranking.isNotEmpty) {
-        mainFilter = ranking[0].item1;
+        if (ranking.isNotEmpty) mainFilter = ranking[0].item1;
+        if (ranking.length > 1) secondaryFilter = ranking[1].item1;
+        if (ranking.length > 2) {
+          unsupportedFilters = ranking.sublist(2).map((t) => t.item1).toList();
+        }
       }
-      if (ranking.length > 1) {
-        secondaryFilter = ranking[1].item1;
-      }
-      if (ranking.length > 2) {
-        unsupportedFilters = ranking.sublist(2).map((t) => t.item1).toList();
+
+      // --- NEW: Ductless Model Selection Logic ---
+      final bool needsHep = selections.any(
+        (s) => s.chemical.specialFilters.contains('HEPA'),
+      );
+      final bool usesFormalin = selections.any(
+        (s) => s.chemical.name.toLowerCase().contains('formalin'),
+      );
+
+      if (needsHep) {
+        if (mainFilter != null) {
+          // Has a main carbon filter AND needs a HEPA filter
+          ductlessModel = 'ADC-D';
+        } else {
+          // Only needs a HEPA filter (common for powders)
+          ductlessModel = 'PW1';
+        }
+      } else if (usesFormalin) {
+        // Specific use-case for Formalin
+        ductlessModel = 'SPF';
+      } else {
+        if (mainFilter != null && secondaryFilter != null) {
+          // Main and secondary carbon filters needed
+          ductlessModel = 'ADC-C';
+        } else if (mainFilter != null) {
+          // Standard case with a single main carbon filter
+          ductlessModel = 'ADC-B';
+        } else {
+          // No specific carbon or HEPA filter needed
+          ductlessModel = 'ADC-B (General Purpose)';
+        }
       }
     }
 
@@ -144,6 +173,7 @@ class RecommendationService {
 
     return {
       'isDucted': defaultIsDucted,
+      'ductlessModel': ductlessModel,
       'reasons': reasons,
       'distinctFilters': distinctFilters.toList(),
       'mainFilter': mainFilter,
