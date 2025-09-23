@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../models/chemical.dart';
 import '../../services/chemical_service.dart';
-import '../widgets/form_action_button.dart';
+import '../widgets/calc_button.dart';
 import '../../widgets/bottom_navigation_bar.dart';
-import '../../chemical_dictionary/widgets/frosted.dart';
 import '../widgets/form_blocks.dart';
 
 class AddChemicalScreen extends StatefulWidget {
@@ -95,11 +94,11 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Changed background
+      backgroundColor: Colors.white,
       extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.white, // Changed AppBar background
+        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.blue),
@@ -114,11 +113,22 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-          child: Frosted(
-            borderRadius: 24,
-            blur: 16,
-            tint: Colors.blue,
-            border: Border.all(color: Colors.blue.shade200),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              gradient: const LinearGradient(
+                colors: [Color(0xFF3AADEA), Color(0xFF0D7AC8)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 14,
+                  offset: Offset(0, 6),
+                ),
+              ],
+            ),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
               child: Form(
@@ -155,13 +165,9 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
                     const SizedBox(height: 12),
                     CalculatedPanel(density: _density, filterType: _filterType),
                     const SizedBox(height: 24),
-                    FormActionButton(
-                      label: 'Done',
-                      onPressed: _onDone,
-                      isPrimary: true,
-                    ),
+                    CalcButton(label: 'Done', onPressed: _onDone),
                     const SizedBox(height: 12),
-                    FormActionButton(
+                    CalcButton(
                       label: 'Cancel',
                       onPressed: () => Navigator.of(context).pop(),
                     ),

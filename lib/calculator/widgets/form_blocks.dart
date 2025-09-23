@@ -39,16 +39,8 @@ class GlassField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.06),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
       ),
       child: Padding(padding: padding, child: child),
     );
@@ -76,7 +68,10 @@ class GlassTextField extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
-        style: const TextStyle(color: Colors.white),
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w700,
+        ),
         validator: validator,
         decoration: InputDecoration(
           labelText: label,
@@ -84,7 +79,7 @@ class GlassTextField extends StatelessWidget {
               ? Icon(prefixIcon, color: Colors.white.withValues(alpha: 0.9))
               : null,
           labelStyle: TextStyle(
-            color: Colors.white.withValues(alpha: 0.75),
+            color: Colors.white.withValues(alpha: 0.8),
             fontWeight: FontWeight.w700,
           ),
           isDense: true,
@@ -157,23 +152,18 @@ class GlassDropdownChemical extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                gradient: isSelected
-                    ? const LinearGradient(
-                        colors: [Color(0xFF3AADEA), Color(0xFF0D7AC8)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      )
-                    : null,
-                color: isSelected ? null : Colors.white.withValues(alpha: 0.06),
+                color: isSelected
+                    ? Colors.white.withValues(alpha: 0.2)
+                    : Colors.white.withValues(alpha: 0.06),
                 border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
               ),
               child: ListTile(
                 dense: true,
                 title: Text(
                   chemical.name,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
-                    fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 trailing: isSelected
@@ -183,7 +173,7 @@ class GlassDropdownChemical extends StatelessWidget {
             );
           },
           menuProps: MenuProps(
-            backgroundColor: Color.fromARGB(255, 27, 114, 168),
+            backgroundColor: const Color(0xFF3AADEA),
             borderRadius: BorderRadius.circular(16),
             elevation: 0,
           ),
@@ -201,7 +191,7 @@ class GlassDropdownChemical extends StatelessWidget {
               color: Colors.white.withValues(alpha: 0.9),
             ),
             labelStyle: TextStyle(
-              color: Colors.white.withValues(alpha: 0.75),
+              color: Colors.white.withValues(alpha: 0.8),
               fontWeight: FontWeight.w700,
             ),
             isDense: true,
@@ -236,7 +226,7 @@ class CalculatedPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassField(
-      padding: const EdgeInsets.fromLTRB(6, 6, 6, 6),
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
       child: Column(
         children: [
           ReadOnlyInfoRow(label: 'Density', value: density),

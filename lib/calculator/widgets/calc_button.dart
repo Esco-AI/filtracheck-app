@@ -13,14 +13,14 @@ class CalcButton extends StatelessWidget {
       width: 240,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.15),
+          color: Colors.white.withValues(alpha: 0.25),
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 18,
-              offset: const Offset(0, 8),
+              color: Colors.black.withValues(alpha: 0.15),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
@@ -30,11 +30,6 @@ class CalcButton extends StatelessWidget {
             backgroundColor: Colors.transparent,
             shadowColor: Colors.transparent,
             shape: const StadiumBorder(),
-            textStyle: const TextStyle(
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.4,
-              fontSize: 16,
-            ),
           ),
           child: Text(
             label,

@@ -91,15 +91,10 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        iconTheme: const IconThemeData(
-          color: Colors.blue,
-        ),
+        iconTheme: const IconThemeData(color: Colors.blue),
         title: const Text(
           'Chemical Calculator',
-          style: TextStyle(
-            fontWeight: FontWeight.w800,
-            color: Colors.blue,
-          ),
+          style: TextStyle(fontWeight: FontWeight.w800, color: Colors.blue),
         ),
       ),
       body: SafeArea(
@@ -108,10 +103,12 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
           child: Frosted(
             borderRadius: 24,
             blur: 16,
-            tint: Colors.blue,
-            border: Border.all(
-              color: hasChemicals ? Colors.grey.shade300 : Colors.blue.shade200,
+            gradient: const LinearGradient(
+              colors: [Color(0xFF3AADEA), Color(0xFF0D7AC8)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
               child: Column(

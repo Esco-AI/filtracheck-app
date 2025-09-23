@@ -23,37 +23,23 @@ class HeatingChecklist extends StatelessWidget {
     );
 
     return Container(
-      margin: const EdgeInsets.only(top: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.06),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title + accent
-            Row(
-              children: [
-                const Text(
-                  'Ducted: Help us narrow the model',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(width: 8),
-              ],
+            // Title
+            const Text(
+              'Ducted: Help us narrow the model',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+              ),
             ),
             const SizedBox(height: 8),
 
@@ -93,7 +79,6 @@ class HeatingChecklist extends StatelessWidget {
                 style: TextStyle(color: Colors.white, fontSize: 14),
               ),
               const SizedBox(height: 12),
-
               RadioGroup<Preference>(
                 groupValue: selectedPreference,
                 onChanged: onPreferenceChanged,

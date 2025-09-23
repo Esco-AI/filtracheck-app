@@ -16,19 +16,10 @@ class ChemicalInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,7 +63,7 @@ class ChemicalInfoCard extends StatelessWidget {
             child: Text(
               label,
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.75),
+                color: Colors.white.withValues(alpha: 0.85),
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
@@ -107,9 +98,9 @@ class _HeaderActions extends StatelessWidget {
         _buildIconButton(
           icon: Icons.delete_outline,
           tooltip: 'Delete',
-          bg: Colors.red.withValues(alpha: 0.15),
-          border: Colors.redAccent,
-          iconColor: Colors.redAccent,
+          bg: Colors.red.withValues(alpha: 0.2),
+          border: Colors.redAccent.withValues(alpha: 0.5),
+          iconColor: Colors.white,
           onTap: onDelete,
         ),
         const SizedBox(width: 8),
@@ -152,20 +143,19 @@ class _HeaderActions extends StatelessWidget {
       color: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(_radius),
-        side: const BorderSide(color: Colors.white),
+        side: BorderSide(color: Colors.white.withValues(alpha: 0.8)),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(_radius),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Text(
             text,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              letterSpacing: 0.2,
             ),
           ),
         ),
