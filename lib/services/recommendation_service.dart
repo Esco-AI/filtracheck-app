@@ -1,5 +1,6 @@
 import 'package:filtracheck_v2/calculator/widgets/heating_selector.dart';
 import 'package:filtracheck_v2/models/chemical.dart';
+import 'package:filtracheck_v2/models/product.dart';
 
 class RecommendationService {
   static Map<String, dynamic> evaluate(
@@ -8,10 +9,11 @@ class RecommendationService {
     Map<String, bool> checklistValues,
     Preference? preference,
   ) {
-    // --- Step 1: Initial Analysis ---
+    // --- Step 1 & 2: Analysis and Ducted/Ductless Decision ---
     final Set<String> distinctFilters = {};
     final Map<String, double> weightedSumQF = {};
     final Map<String, int> filterOccurrenceCounts = {};
+    final Set<String> specialFilters = {};
 
     for (final selection in selections) {
       final chemical = selection.chemical;
@@ -30,17 +32,17 @@ class RecommendationService {
           ifAbsent: () => 1,
         );
       }
+      for (var special in chemical.specialFilters) {
+        specialFilters.add(special);
+      }
     }
 
-    // --- Step 2: Determine Fume Hood Type (Ducted vs. Ductless) ---
     bool defaultIsDucted = false;
     final List<String> reasons = [];
-
     if (involvesHeating) {
       defaultIsDucted = true;
       reasons.add("Heating is involved.");
     }
-
     if (distinctFilters.length > 2) {
       defaultIsDucted = true;
       reasons.add(
@@ -48,11 +50,11 @@ class RecommendationService {
       );
     }
 
-    // --- Step 3: Calculate Filter Dominance for Ductless Hood ---
+    // --- Step 3: Ductless Logic ---
     String? mainFilter;
     String? secondaryFilter;
     List<String> unsupportedFilters = [];
-    String ductlessModel = 'Not Applicable';
+    Product? ductlessProduct;
 
     if (!defaultIsDucted) {
       if (distinctFilters.isNotEmpty) {
@@ -80,41 +82,29 @@ class RecommendationService {
         }
       }
 
-      // --- NEW: Ductless Model Selection Logic ---
-      final bool needsHep = selections.any(
-        (s) => s.chemical.specialFilters.contains('HEPA'),
-      );
+      // --- Ductless Model Selection Logic ---
+      String ductlessModelKey = 'ADC-B'; // Default key
+      final bool needsHep = specialFilters.contains('HEPA');
       final bool usesFormalin = selections.any(
         (s) => s.chemical.name.toLowerCase().contains('formalin'),
       );
 
       if (needsHep) {
-        if (mainFilter != null) {
-          // Has a main carbon filter AND needs a HEPA filter
-          ductlessModel = 'ADC-D';
-        } else {
-          // Only needs a HEPA filter (common for powders)
-          ductlessModel = 'PW1';
-        }
+        ductlessModelKey = (mainFilter != null) ? 'ADC-D' : 'PW1';
       } else if (usesFormalin) {
-        // Specific use-case for Formalin
-        ductlessModel = 'SPF';
+        ductlessModelKey = 'SPF';
       } else {
         if (mainFilter != null && secondaryFilter != null) {
-          // Main and secondary carbon filters needed
-          ductlessModel = 'ADC-C';
+          ductlessModelKey = 'ADC-C';
         } else if (mainFilter != null) {
-          // Standard case with a single main carbon filter
-          ductlessModel = 'ADC-B';
-        } else {
-          // No specific carbon or HEPA filter needed
-          ductlessModel = 'ADC-B (General Purpose)';
+          ductlessModelKey = 'ADC-B';
         }
       }
+      ductlessProduct = productDatabase[ductlessModelKey];
     }
 
     // --- Step 4: Ducted Hood Specific Logic ---
-    List<String> ductedModels = [];
+    List<Product> ductedProducts = [];
     if (defaultIsDucted) {
       final Map<String, bool> selections = {
         "EFP": checklistValues['perchloric_acid'] ?? false,
@@ -126,46 +116,47 @@ class RecommendationService {
       };
 
       final picked = selections.entries
-          .where((entry) => entry.value)
-          .map((entry) => entry.key)
+          .where((e) => e.value)
+          .map((e) => e.key)
           .toList();
 
       if (picked.length == 1) {
-        ductedModels = picked;
+        if (picked[0] == "EFQ/EFA-M") {
+          if (productDatabase['EFQ'] != null) {
+            ductedProducts.add(productDatabase['EFQ']!);
+          }
+          if (productDatabase['EFA-M'] != null) {
+            ductedProducts.add(productDatabase['EFA-M']!);
+          }
+        } else {
+          if (productDatabase[picked[0]] != null) {
+            ductedProducts.add(productDatabase[picked[0]]!);
+          }
+        }
       } else if (picked.length > 1) {
-        // "Couldn't decide" state
         if (preference != null) {
-          switch (preference) {
-            case Preference.efdA:
-              ductedModels = ["EFD-A"];
-              break;
-            case Preference.efdB:
-              ductedModels = ["EFD-B"];
-              break;
-            case Preference.efa:
-              ductedModels = ["EFA"];
-              break;
-            case Preference.efh:
-              ductedModels = ["EFH"];
-              break;
+          const prefMap = {
+            Preference.efdA: 'EFD-A',
+            Preference.efdB: 'EFD-B',
+            Preference.efa: 'EFA',
+            Preference.efh: 'EFH',
+          };
+          final modelKey = prefMap[preference];
+          if (modelKey != null && productDatabase[modelKey] != null) {
+            ductedProducts.add(productDatabase[modelKey]!);
           }
         }
       } else {
-        // Fallback to general preference
         if (preference != null) {
-          switch (preference) {
-            case Preference.efdA:
-              ductedModels = ["EFD-A"];
-              break;
-            case Preference.efdB:
-              ductedModels = ["EFD-B"];
-              break;
-            case Preference.efa:
-              ductedModels = ["EFA"];
-              break;
-            case Preference.efh:
-              ductedModels = ["EFH"];
-              break;
+          const prefMap = {
+            Preference.efdA: 'EFD-A',
+            Preference.efdB: 'EFD-B',
+            Preference.efa: 'EFA',
+            Preference.efh: 'EFH',
+          };
+          final modelKey = prefMap[preference];
+          if (modelKey != null && productDatabase[modelKey] != null) {
+            ductedProducts.add(productDatabase[modelKey]!);
           }
         }
       }
@@ -173,15 +164,14 @@ class RecommendationService {
 
     return {
       'isDucted': defaultIsDucted,
-      'ductlessModel': ductlessModel,
+      'ductlessProduct': ductlessProduct,
       'reasons': reasons,
-      'distinctFilters': distinctFilters.toList(),
       'mainFilter': mainFilter,
       'secondaryFilter': secondaryFilter,
       'unsupportedFilters': unsupportedFilters,
-      'ductedModels': ductedModels,
+      'ductedProducts': ductedProducts,
       'multipleDuctedOptions':
-          (ductedModels.isEmpty &&
+          (ductedProducts.isEmpty &&
           (checklistValues.values.where((v) => v).length > 1)),
     };
   }
