@@ -1,5 +1,3 @@
-// lib/calculator/screens/recommendation_screen.dart
-
 import 'package:flutter/material.dart';
 import '../../widgets/bottom_navigation_bar.dart';
 import '../../chemical_dictionary/widgets/frosted.dart';
@@ -14,20 +12,17 @@ class RecommendationScreen extends StatelessWidget {
     final bool isDucted = recommendation['isDucted'] ?? false;
 
     return Scaffold(
-      backgroundColor: Colors.white, // Changed background to white
+      backgroundColor: Colors.white,
       extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.white, // Changed AppBar to white
+        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.blue), // Blue back arrow
+        iconTheme: const IconThemeData(color: Colors.blue),
         title: const Text(
           'Recommendation Result',
-          style: TextStyle(
-            fontWeight: FontWeight.w800,
-            color: Colors.blue, // Blue title
-          ),
+          style: TextStyle(fontWeight: FontWeight.w800, color: Colors.blue),
         ),
       ),
       body: SafeArea(
@@ -36,7 +31,7 @@ class RecommendationScreen extends StatelessWidget {
           child: Frosted(
             borderRadius: 24,
             blur: 16,
-            tint: Colors.blue, // Changed card background to blue
+            tint: Colors.blue,
             border: Border.all(color: Colors.blue.shade200),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
@@ -58,6 +53,9 @@ class RecommendationScreen extends StatelessWidget {
     final List<String> unsupportedFilters =
         recommendation['unsupportedFilters'] ?? [];
 
+    final String ductlessModel =
+        recommendation['ductlessModel'] ?? 'Not Determined';
+
     int filterCount = 0;
     if (mainFilter != null) filterCount++;
     if (secondaryFilter != null) filterCount++;
@@ -77,7 +75,7 @@ class RecommendationScreen extends StatelessWidget {
           'Secondary Filter:',
           secondaryFilter != null ? 'Type $secondaryFilter' : 'None',
         ),
-        _infoRow('Fume Hood Model:', 'ADC-B or D/SPD/SPB'),
+        _infoRow('Fume Hood Model:', ductlessModel),
         if (unsupportedFilters.isNotEmpty) ...[
           const SizedBox(height: 16),
           const Divider(color: Colors.white24),
