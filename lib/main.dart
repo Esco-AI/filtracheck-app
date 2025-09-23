@@ -34,7 +34,7 @@ class FiltraCheckApp extends StatelessWidget {
           systemOverlayStyle: SystemUiOverlayStyle.light,
         ),
       ),
-
+ 
       home: const HomeScreen(),
     );
   }
