@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'heating_selector.dart' as ducted;
 
-/// Frosted container + custom glass segmented switch
+/// Container for heating options + custom segmented switch
 class CalcHeatingSelector extends StatelessWidget {
   final bool involvesHeating;
   final Map<String, bool> checklistValues;
@@ -25,21 +25,15 @@ class CalcHeatingSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // This is the "Does it involve heating?" container
         Container(
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.06),
+            // Updated to the new color, removing border and shadow
+            color: Colors.white.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.25),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              ),
-            ],
           ),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
             child: Row(
               children: [
                 const Expanded(
@@ -61,7 +55,6 @@ class CalcHeatingSelector extends StatelessWidget {
             ),
           ),
         ),
-
         if (involvesHeating) ...[
           const SizedBox(height: 12),
           ducted.HeatingChecklist(
@@ -106,12 +99,9 @@ class GlassSegmentedSwitch extends StatelessWidget {
       height: 36,
       width: 160,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.06),
+        // Updated switch background
+        color: Colors.black.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.22),
-          width: 1,
-        ),
       ),
       clipBehavior: Clip.antiAlias,
       child: Stack(
@@ -119,38 +109,30 @@ class GlassSegmentedSwitch extends StatelessWidget {
           AnimatedAlign(
             duration: const Duration(milliseconds: 180),
             curve: Curves.easeOut,
-            alignment: value ? Alignment.centerLeft : Alignment.centerRight,
+            alignment: value ? Alignment.centerRight : Alignment.centerLeft,
             child: Container(
               width: 80,
               height: 36,
               decoration: BoxDecoration(
                 gradient: gradient,
                 borderRadius: BorderRadius.circular(999),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.25),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
               ),
             ),
           ),
-
           Row(
             children: [
-              Expanded(
-                child: _SegmentLabel(
-                  text: 'Yes',
-                  selected: value,
-                  onTap: () => onChanged(true),
-                ),
-              ),
               Expanded(
                 child: _SegmentLabel(
                   text: 'No',
                   selected: !value,
                   onTap: () => onChanged(false),
+                ),
+              ),
+              Expanded(
+                child: _SegmentLabel(
+                  text: 'Yes',
+                  selected: value,
+                  onTap: () => onChanged(true),
                 ),
               ),
             ],

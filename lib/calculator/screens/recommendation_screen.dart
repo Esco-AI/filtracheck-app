@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/product.dart';
 import '../../widgets/bottom_navigation_bar.dart';
-import '../../chemical_dictionary/widgets/frosted.dart';
+import '../widgets/calc_button.dart';
 
 class RecommendationScreen extends StatefulWidget {
   final Map<String, dynamic> recommendation;
@@ -15,7 +15,6 @@ class RecommendationScreen extends StatefulWidget {
 class _RecommendationScreenState extends State<RecommendationScreen> {
   String? _selectedSize;
 
-  // Function to get the model key from the product object
   String getModelKey(Product product) {
     var entry = productDatabase.entries.firstWhere(
       (entry) => entry.value == product,
@@ -33,13 +32,11 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
     final Product? ductlessProduct = widget.recommendation['ductlessProduct'];
     final List<Product> ductedProducts =
         widget.recommendation['ductedProducts'] ?? [];
-
-    // Determine which product to show. For ducted, we'll just show the first one if multiple are possible.
     final Product? productToShow = isDucted
         ? (ductedProducts.isNotEmpty ? ductedProducts.first : null)
         : ductlessProduct;
 
-    // Set initial dropdown value
+    // Set initial dropdown value if not already set
     if (_selectedSize == null &&
         productToShow != null &&
         productToShow.availableSizes.isNotEmpty) {
@@ -54,35 +51,32 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.blue),
         title: const Text(
-          'Recommendation Result',
+          'Recommendation',
           style: TextStyle(fontWeight: FontWeight.w800, color: Colors.blue),
         ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-          child: Frosted(
-            borderRadius: 24,
-            blur: 16,
-            tint: Colors.blue,
-            border: Border.all(color: Colors.blue.shade200),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
-              child: productToShow == null
-                  ? _buildNoProductState(context, isDucted)
-                  : _buildProductRecommendation(
-                      context,
-                      productToShow,
-                      isDucted,
-                    ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF3AADEA), Color(0xFF0D7AC8)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
+            borderRadius: BorderRadius.circular(24),
           ),
+          child: productToShow == null
+              ? _buildNoProductState(context)
+              : _buildProductRecommendation(context, productToShow, isDucted),
         ),
       ),
       bottomNavigationBar: const AppBottomNav(currentIndex: 0),
     );
   }
 
+  // --- Main Widget for Displaying the Product ---
   Widget _buildProductRecommendation(
     BuildContext context,
     Product product,
@@ -90,84 +84,120 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
   ) {
     final String? mainFilter = widget.recommendation['mainFilter'];
     final String? secondaryFilter = widget.recommendation['secondaryFilter'];
-    int filterCount =
-        (mainFilter != null ? 1 : 0) + (secondaryFilter != null ? 1 : 0);
-    String modelKey = getModelKey(product);
-    String hoodType = isDucted ? "Ducted Fume Hood" : "Ductless Fume Hood";
+    final String modelKey = getModelKey(product);
+    final String hoodType = isDucted
+        ? "Ducted Fume Hood"
+        : "Ductless Fume Hood";
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // --- Product Type Header ---
+        // Header
         Text(
-          hoodType,
+          "Here's Your Recommended Fume Hood",
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.85),
+            color: Colors.white.withOpacity(0.9),
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
 
-        // --- Product Image ---
+        // Product Image
         Container(
-          height: 200,
+          height: 220,
+          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.9),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 15,
-                offset: const Offset(0, 5),
-              ),
-            ],
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Image.asset(
-              product.imagePath,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => const Icon(
-                Icons.inventory_2_outlined,
-                size: 60,
-                color: Colors.grey,
-              ),
+          child: Image.asset(
+            product.imagePath,
+            fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) => const Icon(
+              Icons.inventory_2_outlined,
+              size: 60,
+              color: Colors.grey,
             ),
           ),
         ),
         const SizedBox(height: 20),
 
-        // --- Product Name ---
+        // Product Name and Type
         Text(
           product.name,
           textAlign: TextAlign.center,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 22,
+            fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 20),
-
-        // --- Specifications ---
-        _infoRow('Model Code:', modelKey),
-        _infoRow(
-          'Main Filter:',
-          isDucted ? 'N/A' : (mainFilter != null ? 'Type $mainFilter' : 'None'),
+        Text(
+          hoodType,
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
         ),
-        _infoRow(
-          'Secondary Filter:',
-          isDucted
-              ? 'N/A'
-              : (secondaryFilter != null ? 'Type $secondaryFilter' : 'None'),
+        const SizedBox(height: 24),
+
+        // Specifications in Pills
+        _buildSpecPills(modelKey, mainFilter, secondaryFilter, isDucted),
+        const SizedBox(height: 24),
+
+        // Size Selector
+        _buildSizeSelector(product),
+        const SizedBox(height: 24),
+
+        // Action Button
+        CalcButton(
+          label: 'Learn More',
+          onPressed: () {
+            // TODO: Implement Learn More action
+          },
         ),
-        _infoRow('No. of Filter:', isDucted ? 'N/A' : filterCount.toString()),
+      ],
+    );
+  }
 
-        const Divider(color: Colors.white24, height: 30),
+  // --- Helper for Spec Pills ---
+  Widget _buildSpecPills(
+    String modelKey,
+    String? mainFilter,
+    String? secondaryFilter,
+    bool isDucted,
+  ) {
+    if (isDucted) {
+      return _InfoPill(label: 'Model Code', value: modelKey);
+    }
+    return Row(
+      children: [
+        Expanded(
+          child: _InfoPill(label: 'Model Code', value: modelKey),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _InfoPill(
+            label: 'Main Filter',
+            value: mainFilter != null ? 'Type $mainFilter' : 'None',
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _InfoPill(
+            label: 'Secondary',
+            value: secondaryFilter != null ? 'Type $secondaryFilter' : 'None',
+          ),
+        ),
+      ],
+    );
+  }
 
-        // --- Size Selector ---
+  // --- Helper for Size Dropdown ---
+  Widget _buildSizeSelector(Product product) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
         const Text(
           'Choose Preferred Size:',
           style: TextStyle(
@@ -177,122 +207,119 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.9),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: DropdownButton<String>(
-            value: _selectedSize,
-            isExpanded: true,
-            underline: const SizedBox.shrink(),
-            dropdownColor: Colors.white,
-            icon: const Icon(
-              Icons.arrow_drop_down,
-              color: Colors.blue,
-              size: 28,
+        DropdownButtonFormField<String>(
+          value: _selectedSize,
+          isExpanded: true,
+          icon: const Icon(Icons.arrow_drop_down, color: Colors.blue),
+          dropdownColor: Colors.white,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 4,
             ),
-            items: product.availableSizes
-                .map(
-                  (size) => DropdownMenuItem(
-                    value: size,
-                    child: Text(
-                      size,
-                      style: const TextStyle(
-                        color: Colors.black87,
-                        fontWeight: FontWeight.bold,
-                      ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+          ),
+          items: product.availableSizes
+              .map(
+                (size) => DropdownMenuItem(
+                  value: size,
+                  child: Text(
+                    size,
+                    style: const TextStyle(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                )
-                .toList(),
-            onChanged: (value) {
-              if (value != null) {
-                setState(() => _selectedSize = value);
-              }
-            },
-          ),
-        ),
-        const SizedBox(height: 20),
-
-        // --- Action Button ---
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue.shade900,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-          onPressed: () {
-            // TODO: Handle Learn More action
+                ),
+              )
+              .toList(),
+          onChanged: (value) {
+            if (value != null) setState(() => _selectedSize = value);
           },
-          child: const Text(
-            'Learn More',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
         ),
       ],
     );
   }
 
-  Widget _buildNoProductState(BuildContext context, bool isDucted) {
-    String message = isDucted
-        ? "Multiple options are available. Please select your general preferences on the previous screen to narrow down the model recommendation."
-        : "We couldn't determine a specific model for your needs. Please contact us for a consultation.";
+  // --- Fallback Widget when no product is recommended ---
+  Widget _buildNoProductState(BuildContext context) {
+    String message =
+        "Multiple options might be available. Please refine your preferences on the previous screen for a specific recommendation.";
 
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 40.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.help_outline, color: Colors.white, size: 50),
-            const SizedBox(height: 16),
-            Text(
-              "Recommendation Pending",
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 40.0),
+      child: Column(
+        children: [
+          Icon(
+            Icons.biotech_outlined,
+            color: Colors.white.withOpacity(0.8),
+            size: 60,
+          ),
+          const SizedBox(height: 20),
+          Text(
+            "Further Input Required",
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.9),
+              fontSize: 16,
+              height: 1.4,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
+}
 
-  Widget _infoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Row(
+// A new, reusable widget for displaying spec info pills
+class _InfoPill extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _InfoPill({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
         children: [
-          Expanded(
-            child: Text(
-              label,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.85),
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-              ),
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.8),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
             ),
           ),
+          const SizedBox(height: 4),
           Text(
             value,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 15,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
             ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
