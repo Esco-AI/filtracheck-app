@@ -1,3 +1,5 @@
+// lib/chemical_dictionary/widgets/chemical_card.dart
+
 import 'package:flutter/material.dart';
 import '../../../models/chemical.dart';
 import 'frosted.dart';
@@ -22,8 +24,13 @@ class ChemicalCard extends StatelessWidget {
       child: Frosted(
         borderRadius: 18,
         blur: 14,
-        tint: Colors.white.withValues(alpha: 0.06),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+        // Use the blue gradient you suggested
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF3AADEA), Color(0xFF0D7AC8)],
+        ),
+        border: Border.all(color: Colors.white.withOpacity(0.2)),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Row(
@@ -40,7 +47,7 @@ class ChemicalCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: Colors.white, // Changed back to white
                         fontWeight: FontWeight.w800,
                         fontSize: 16,
                         height: 1.15,
@@ -73,7 +80,7 @@ class ChemicalCard extends StatelessWidget {
               const SizedBox(width: 6),
               Icon(
                 Icons.chevron_right_rounded,
-                color: Colors.white.withValues(alpha: 0.7),
+                color: Colors.white.withOpacity(0.7), // Changed back to light
               ),
             ],
           ),
@@ -101,15 +108,12 @@ class _IconBadge extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0D7AC8).withValues(alpha: 0.35),
+            color: const Color(0xFF0D7AC8).withOpacity(0.35),
             blurRadius: 18,
             offset: const Offset(0, 10),
           ),
         ],
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.35),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.35), width: 1),
       ),
       alignment: Alignment.center,
       child: Text(
@@ -138,7 +142,7 @@ class _MiniRow extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.85),
+            color: Colors.white.withOpacity(0.85), // Changed back to light
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -149,7 +153,7 @@ class _MiniRow extends StatelessWidget {
             textAlign: TextAlign.right,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              color: Colors.white,
+              color: Colors.white, // Changed back to white
               fontWeight: FontWeight.w800,
             ),
           ),

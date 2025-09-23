@@ -17,8 +17,7 @@ class FiltraCheckApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.transparent,
-          surfaceTintColor: Colors.transparent,
+          backgroundColor: Colors.white,
           elevation: 0,
           centerTitle: true,
 
@@ -34,7 +33,7 @@ class FiltraCheckApp extends StatelessWidget {
           systemOverlayStyle: SystemUiOverlayStyle.light,
         ),
       ),
- 
+
       home: const HomeScreen(),
     );
   }

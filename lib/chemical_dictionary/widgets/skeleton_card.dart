@@ -16,8 +16,8 @@ class SkeletonCard extends StatelessWidget {
           child: Frosted(
             borderRadius: 18,
             blur: 14,
-            tint: Colors.white.withValues(alpha: 0.06),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+            tint: Colors.white,
+            border: Border.all(color: Colors.grey.shade300),
             child: Container(
               padding: const EdgeInsets.all(16),
               child: Opacity(
@@ -30,7 +30,7 @@ class SkeletonCard extends StatelessWidget {
                           width: 46,
                           height: 46,
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.12),
+                            color: Colors.grey.shade200,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -39,7 +39,7 @@ class SkeletonCard extends StatelessWidget {
                           child: Container(
                             height: 14,
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.12),
+                              color: Colors.grey.shade200,
                               borderRadius: BorderRadius.circular(6),
                             ),
                           ),
@@ -50,7 +50,7 @@ class SkeletonCard extends StatelessWidget {
                     Container(
                       height: 12,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.10),
+                        color: Colors.grey.shade200,
                         borderRadius: BorderRadius.circular(6),
                       ),
                     ),
@@ -58,7 +58,7 @@ class SkeletonCard extends StatelessWidget {
                     Container(
                       height: 12,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.10),
+                        color: Colors.grey.shade200,
                         borderRadius: BorderRadius.circular(6),
                       ),
                     ),

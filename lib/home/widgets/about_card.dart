@@ -9,8 +9,8 @@ class AboutCard extends StatelessWidget {
     return Frosted(
       borderRadius: 20,
       blur: 16,
-      tint: Colors.white.withValues(alpha: 0.06),
-      border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+      tint: Colors.white, // Changed to white
+      border: Border.all(color: Colors.grey.shade300), // Adjusted border
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
         child: Column(
@@ -22,32 +22,20 @@ class AboutCard extends StatelessWidget {
                 Text(
                   'About the App',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Colors.white,
+                    color: Colors.black87, // Changed for visibility
                     fontWeight: FontWeight.w800,
                   ),
                 ),
                 const SizedBox(width: 8),
-                Container(
-                  height: 4,
-                  width: 40,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF7E57C2), Color(0xFFEC407A)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.all(Radius.circular(2)),
-                  ),
-                ),
               ],
             ),
             const SizedBox(height: 12),
-            Divider(color: Colors.white.withValues(alpha: 0.12), height: 1),
+            Divider(color: Colors.grey.shade200, height: 1),
             const SizedBox(height: 12),
             Text(
               "Esco’s FiltraCheck™ is a free chemical assessment guide dedicated to help you select the right filter for your intended.",
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.white.withValues(alpha: 0.92),
+                color: Colors.black.withValues(alpha: 0.8),
               ),
             ),
           ],

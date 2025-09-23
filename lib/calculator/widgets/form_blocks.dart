@@ -19,18 +19,6 @@ class SectionHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        Container(
-          height: 4,
-          width: 40,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF7E57C2), Color(0xFFEC407A)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.all(Radius.circular(2)),
-          ),
-        ),
       ],
     );
   }

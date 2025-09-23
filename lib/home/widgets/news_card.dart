@@ -9,8 +9,8 @@ class NewsCard extends StatelessWidget {
     return Frosted(
       borderRadius: 20,
       blur: 14,
-      tint: Colors.white.withValues(alpha: 0.06),
-      border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+      tint: Colors.white, // Changed to white
+      border: Border.all(color: Colors.grey.shade300), // Adjusted border
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -31,7 +31,7 @@ class NewsCard extends StatelessWidget {
                 Text(
                   'Into the Genome: COVID-19 Diagnostics',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: Colors.white,
+                    color: Colors.black87, // Changed for visibility
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -41,7 +41,9 @@ class NewsCard extends StatelessWidget {
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.92),
+                    color: Colors.black.withOpacity(
+                      0.8,
+                    ), // Changed for visibility
                     height: 1.25,
                   ),
                 ),
@@ -57,16 +59,9 @@ class NewsCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(999),
                 onTap: () {},
                 child: Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Color(0xFF7E57C2),
-                        Color(0xFFEC407A),
-                      ], // purple → pink
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.all(Radius.circular(999)),
+                  decoration: BoxDecoration(
+                    color: Colors.blue, // Changed to blue
+                    borderRadius: const BorderRadius.all(Radius.circular(999)),
                   ),
                   alignment: Alignment.center,
                   child: const Text(

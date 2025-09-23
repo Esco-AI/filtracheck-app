@@ -14,24 +14,20 @@ class FormActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gradient = isPrimary
-        ? const LinearGradient(
-            colors: [Color(0xFF7E57C2), Color(0xFFEC407A)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          )
-        : const LinearGradient(
-            colors: [Color(0xFF3AADEA), Color(0xFF0D7AC8)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          );
-
     return SizedBox(
       height: 50,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          gradient: gradient,
+          color: Colors.white.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.2),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: ElevatedButton(
           onPressed: onPressed,

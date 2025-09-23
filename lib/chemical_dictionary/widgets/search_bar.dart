@@ -37,26 +37,34 @@ class _FrostedSearchBarState extends State<FrostedSearchBar> {
       child: Frosted(
         borderRadius: 16,
         blur: 16,
-        tint: Colors.white.withValues(alpha: 0.06),
+        tint: Colors.grey.shade100,
         border: Border.all(
           color: _focused
-              ? Colors.white.withValues(alpha: 0.45)
-              : Colors.white.withValues(alpha: 0.18),
+              ? Colors.blue
+              : Colors.grey.shade300,
         ),
         child: Row(
           children: [
             const SizedBox(width: 10),
-            const Icon(Icons.search_rounded, color: Colors.white70),
+            Icon(
+              Icons.search_rounded,
+              color: Colors.grey.shade600,
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: TextField(
                 controller: widget.controller,
                 focusNode: widget.focusNode,
-                style: const TextStyle(color: Colors.white, fontSize: 16),
-                cursorColor: Colors.white,
-                decoration: const InputDecoration(
+                style: const TextStyle(
+                  color: Colors.black87,
+                  fontSize: 16,
+                ),
+                cursorColor: Colors.blue,
+                decoration: InputDecoration(
                   hintText: 'Search by name, CAS, or formula',
-                  hintStyle: TextStyle(color: Colors.white70),
+                  hintStyle: TextStyle(
+                    color: Colors.grey.shade600,
+                  ),
                   border: InputBorder.none,
                   isDense: true,
                 ),
@@ -66,7 +74,7 @@ class _FrostedSearchBarState extends State<FrostedSearchBar> {
               IconButton(
                 onPressed: widget.onClear,
                 splashRadius: 18,
-                icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                icon: Icon(Icons.close_rounded, color: Colors.grey.shade600),
               ),
           ],
         ),
