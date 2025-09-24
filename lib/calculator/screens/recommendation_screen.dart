@@ -1,3 +1,4 @@
+import 'package:filtracheck_v2/calculator/screens/product_details_screen.dart';
 import 'package:flutter/material.dart';
 import '../../models/product.dart';
 import '../../widgets/bottom_navigation_bar.dart';
@@ -97,7 +98,7 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
           "Here's Your Recommended Fume Hood",
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.9),
+            color: Colors.white.withValues(alpha: 0.9),
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -137,7 +138,10 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
         Text(
           hoodType,
           textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.8),
+            fontSize: 14,
+          ),
         ),
         const SizedBox(height: 24),
 
@@ -153,7 +157,11 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
         CalcButton(
           label: 'Learn More',
           onPressed: () {
-            // TODO: Implement Learn More action
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => ProductDetailsScreen(product: product),
+              ),
+            );
           },
         ),
       ],
@@ -208,7 +216,7 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          value: _selectedSize,
+          initialValue: _selectedSize,
           isExpanded: true,
           icon: const Icon(Icons.arrow_drop_down, color: Colors.blue),
           dropdownColor: Colors.white,
@@ -257,7 +265,7 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
         children: [
           Icon(
             Icons.biotech_outlined,
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
             size: 60,
           ),
           const SizedBox(height: 20),
@@ -275,7 +283,7 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
             message,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               fontSize: 16,
               height: 1.4,
             ),
@@ -298,7 +306,7 @@ class _InfoPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -306,7 +314,7 @@ class _InfoPill extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontSize: 12,
               fontWeight: FontWeight.w600,
             ),

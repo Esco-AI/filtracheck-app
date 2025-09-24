@@ -13,8 +13,12 @@ class FeaturePanel extends StatelessWidget {
     return Frosted(
       borderRadius: 20,
       blur: 16,
-      tint: Colors.blue, // Changed to blue
-      border: Border.all(color: Colors.blue.shade200), // Adjusted border color
+      gradient: const LinearGradient(
+        colors: [Color(0xFF3AADEA), Color(0xFF0D7AC8)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      border: Border.all(color: Colors.blue.shade200),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         child: LayoutBuilder(
