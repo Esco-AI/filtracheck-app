@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:filtracheck_v2/calculator/screens/product_details_screen.dart';
 import 'package:flutter/material.dart';
 import '../../models/product.dart';
@@ -106,21 +108,43 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
         const SizedBox(height: 24),
 
         // Product Image
-        Container(
+        SizedBox(
           height: 220,
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Image.asset(
-            product.imagePath,
-            fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) => const Icon(
-              Icons.inventory_2_outlined,
-              size: 60,
-              color: Colors.grey,
-            ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      radius: 0.53,
+                      colors: [
+                        Colors.white.withValues(alpha: 0.40),
+                        Colors.white.withValues(alpha: 0.00),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              ImageFiltered(
+                imageFilter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                child: Opacity(
+                  opacity: 0.25,
+                  child: Image.asset(product.imagePath, fit: BoxFit.contain),
+                ),
+              ),
+
+              Image.asset(
+                product.imagePath,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => const Icon(
+                  Icons.inventory_2_outlined,
+                  size: 60,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 20),
