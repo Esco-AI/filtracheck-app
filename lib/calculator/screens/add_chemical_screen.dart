@@ -178,7 +178,7 @@ class _AddChemicalScreenState extends State<AddChemicalScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: const AppBottomNav(currentIndex: 0),
+      bottomNavigationBar: const AppBottomNav(),
     );
   }
 }

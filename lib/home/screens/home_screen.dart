@@ -26,7 +26,7 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       body: const _HomeTab(),
-      bottomNavigationBar: const AppBottomNav(currentIndex: 0),
+      bottomNavigationBar: const AppBottomNav(activeIndex: 0),
     );
   }
 }
