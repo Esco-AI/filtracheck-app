@@ -166,7 +166,7 @@ class _CalculatorIntroScreenState extends State<CalculatorIntroScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: const AppBottomNav(currentIndex: 0),
+      bottomNavigationBar: const AppBottomNav(),
     );
   }
 }

@@ -4,13 +4,13 @@ import 'bottom_navigation_bar.dart';
 class BaseScaffold extends StatelessWidget {
   final String title;
   final Widget body;
-  final int currentIndex;
+  final int activeIndex;
 
   const BaseScaffold({
     super.key,
     required this.title,
     required this.body,
-    required this.currentIndex,
+    required this.activeIndex,
   });
 
   @override
@@ -18,7 +18,7 @@ class BaseScaffold extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       body: body,
-      bottomNavigationBar: AppBottomNav(currentIndex: currentIndex),
+      bottomNavigationBar: AppBottomNav(activeIndex: activeIndex),
     );
   }
 }

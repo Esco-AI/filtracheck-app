@@ -135,7 +135,7 @@ class _ChemicalDictionaryScreenState extends State<ChemicalDictionaryScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: const AppBottomNav(currentIndex: 0),
+      bottomNavigationBar: const AppBottomNav(),
     );
   }
 

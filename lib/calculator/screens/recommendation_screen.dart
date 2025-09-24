@@ -75,7 +75,7 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
               : _buildProductRecommendation(context, productToShow, isDucted),
         ),
       ),
-      bottomNavigationBar: const AppBottomNav(currentIndex: 0),
+      bottomNavigationBar: const AppBottomNav(),
     );
   }
 

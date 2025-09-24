@@ -2,26 +2,30 @@ import 'package:flutter/material.dart';
 import '../home/screens/home_screen.dart';
 
 class AppBottomNav extends StatelessWidget {
-  final int currentIndex;
-  const AppBottomNav({super.key, required this.currentIndex});
+  final int? activeIndex;
+  const AppBottomNav({super.key, this.activeIndex});
 
   @override
   Widget build(BuildContext context) {
+    final bool isAnyItemSelected = activeIndex != null;
+
     return BottomNavigationBar(
       backgroundColor: Colors.white,
       elevation: 8.0,
       type: BottomNavigationBarType.fixed,
-      currentIndex: currentIndex,
+      currentIndex: activeIndex ?? 0,
       onTap: (i) {
         if (i == 0) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const HomeScreen()),
-            (route) => false,
-          );
+          if (activeIndex != 0) {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+              (route) => false,
+            );
+          }
         }
-        // i == 1 = About (future feature)
+        // i == 1 will be for the 'About' screen in the future
       },
-      selectedItemColor: Colors.blue,
+      selectedItemColor: isAnyItemSelected ? Colors.blue : Colors.grey,
       unselectedItemColor: Colors.grey,
       selectedLabelStyle: const TextStyle(
         fontWeight: FontWeight.w800,
