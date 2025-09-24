@@ -173,7 +173,7 @@ class GlassDropdownChemical extends StatelessWidget {
             );
           },
           menuProps: MenuProps(
-            backgroundColor: const Color(0xFF3AADEA),
+            backgroundColor: const Color(0xFF0D7AC8),
             borderRadius: BorderRadius.circular(16),
             elevation: 0,
           ),
